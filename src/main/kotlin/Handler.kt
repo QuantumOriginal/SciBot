@@ -19,9 +19,10 @@ class Handler {
         return Response(Status.OK).body("")
     }
 
-    init {
+    fun init() {
         val handler = app
-        val server = handler.asServer(SunHttp(9912)).start()
-        println("Server started on port ${server.port()}")
+        val cfg = Configurations()
+        val server = handler.asServer(SunHttp(cfg.get("server_port") as Int)).start()
+        println("Backend Service started on port ${server.port()}.")
     }
 }

@@ -5,6 +5,8 @@ import org.http4k.core.Filter
 import org.http4k.core.HttpHandler
 import org.http4k.core.Request
 import org.http4k.core.then
+import kotlinx.coroutines.*
+import java.lang.Thread.sleep
 
 val printResponseBodyFilter = Filter { next ->
     { request: Request ->
@@ -15,6 +17,8 @@ val printResponseBodyFilter = Filter { next ->
 }
 val client: HttpHandler = JavaHttpClient()
 val QClient = printResponseBodyFilter.then(client)
-fun main() {
+fun main(){
+    val cfg: Configurations = Configurations();
     val web: Handler = Handler()
+    web.init()
 }
