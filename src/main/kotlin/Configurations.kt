@@ -35,7 +35,6 @@ class Configurations {
         /*if (!configMap.containsKey(key)) {
             return defaultConfigMap[key]
         }
-
          */
         return configMap[key]
     }

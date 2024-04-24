@@ -4,7 +4,7 @@ import kotlin.reflect.full.declaredFunctions
 import kotlin.reflect.full.findAnnotation
 
 class Loader {
-    fun call(instance: Any, type: Annonations.MsgTypes, arg: String) {
+    fun call(instance: Any, type: Annonations.MsgTypes, arg: Any) {
         val functions = instance::class.declaredFunctions
         for (function in functions) {
             val annotation = function.findAnnotation<Annonations.PlainHandler>()

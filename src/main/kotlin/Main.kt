@@ -5,8 +5,6 @@ import org.http4k.core.Filter
 import org.http4k.core.HttpHandler
 import org.http4k.core.Request
 import org.http4k.core.then
-import kotlinx.coroutines.*
-import java.lang.Thread.sleep
 
 val printResponseBodyFilter = Filter { next ->
     { request: Request ->
