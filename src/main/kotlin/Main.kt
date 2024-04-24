@@ -18,5 +18,7 @@ val QClient = printResponseBodyFilter.then(client)
 fun main(){
     val cfg: Configurations = Configurations();
     val web: Handler = Handler()
+    val pluginManager = PluginManager()
+    pluginManager.load()
     web.init()
 }
