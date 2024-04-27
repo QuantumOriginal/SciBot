@@ -38,10 +38,14 @@ class Deliver{
                     val event: Events.AtMessage = Events.AtMessage(msgDetailObj.getLong("qq"))
                     msgArrs.add(event)
                 }
+                "image" -> {
+                    val event: Events.PicMessage = Events.PicMessage(msgDetailObj.getString("url"))
+                    msgArrs.add(event)
+                }
             }
         }
         val sender: Events.Sender = Events.Sender(uid,nickname, role)
-        callPlugins(MessageConstructor.Types.PLAIN, listsOfMsgSegs, false, sender)
+        callPlugins(utils.determineType(msgArrs), msgArrs, false, sender)
     }
     fun callPlugins(type: MessageConstructor.Types, arg: Any, isPriv:Boolean, sender: Events.Sender){
         for (registeredPluginClass in registeredPluginClasses) {
@@ -59,12 +63,16 @@ class Deliver{
                     val event: Events.PlainMessage = Events.PlainMessage(msgDetailObj.getString("text"))
                     msgArrs.add(event)
                 }
+                "image" -> {
+                    val event: Events.PicMessage = Events.PicMessage(msgDetailObj.getString("url"))
+                    msgArrs.add(event)
+                }
             }
         }
         val senderObj = body.getJSONObject("sender")
         val uid: Long = senderObj.getLong("user_id")
         val nickname: String = senderObj.getString("nickname")
         val sender: Events.Sender = Events.Sender(uid,nickname)
-        callPlugins(MessageConstructor.Types.PLAIN, msgArrs, true, sender)
+        callPlugins(utils.determineType(msgArrs), msgArrs, true, sender)
     }
 }

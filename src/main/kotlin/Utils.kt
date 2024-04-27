@@ -19,4 +19,21 @@ class Utils {
         }
         return false
     }
+    fun determineType(list: MutableList<Any>):MessageConstructor.Types{
+        for (i in 0 until list.size){
+            when(list.get(i)){
+                (list.get(i) is Events.PlainMessage) -> {
+                    //DO NOTHING
+                }
+                (list.get(i) is Events.AtMessage) -> {
+                    return MessageConstructor.Types.AT
+                }
+                (list.get(i) is Events.PicMessage) -> {
+                    return MessageConstructor.Types.IMG
+                }
+                //WORKING...
+            }
+        }
+        return MessageConstructor.Types.PLAIN
+    }
 }
