@@ -1,17 +1,11 @@
 package ind.glowingstone
-
+import ind.glowingstone.MessageConstructor.Types
 class Annonations {
     @Retention(AnnotationRetention.RUNTIME)
     @Target(AnnotationTarget.FUNCTION, AnnotationTarget.PROPERTY_GETTER, AnnotationTarget.PROPERTY_SETTER)
-    annotation class PlainHandler(val type: MsgTypes = MsgTypes.PLAIN)
-    enum class MsgTypes {
-        PLAIN,
-        IMG,
-        FACE,
-        RECORD,
-        VIDEO,
-        AT,
-        SHARE,
-        REPLY
-    }
+    annotation class PlainHandler(val type:Types = Types.PLAIN)
+
+    @Retention(AnnotationRetention.RUNTIME)
+    @Target(AnnotationTarget.FUNCTION, AnnotationTarget.PROPERTY_GETTER, AnnotationTarget.PROPERTY_SETTER)
+    annotation class PrivateHandler(val type: Types = Types.PLAIN)
 }
