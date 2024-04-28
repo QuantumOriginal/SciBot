@@ -20,8 +20,7 @@ class Handler {
         return Response(Status.OK).body("")
     }
     private fun handleRunning(req: Request): Response {
-        val Pluginnum = PluginManager.Companion.registeredPluginClasses.size
-        val Body = "Sci-Bot project running. \n $Pluginnum plugins(handlers) loaded."
+        val Body = "Sci-Bot project running. \n plugins(handlers) loaded."
         return Response(Status.OK).body(Body)
     }
     fun init() {

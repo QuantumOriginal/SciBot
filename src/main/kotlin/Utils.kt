@@ -25,9 +25,6 @@ class Utils {
                 (list.get(i) is Events.PlainMessage) -> {
                     //DO NOTHING
                 }
-                (list.get(i) is Events.AtMessage) -> {
-                    return MessageConstructor.Types.AT
-                }
                 (list.get(i) is Events.PicMessage) -> {
                     return MessageConstructor.Types.IMG
                 }

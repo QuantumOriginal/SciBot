@@ -1,6 +1,4 @@
 package ind.glowingstone
-
-import ind.glowingstone.PluginManager.Companion.registeredPluginClasses
 import org.json.JSONArray
 import org.json.JSONObject
 
@@ -44,13 +42,11 @@ class Deliver{
                 }
             }
         }
-        val sender: Events.Sender = Events.Sender(uid,nickname, role)
+        val sender = Events.Sender(uid,nickname, role)
         callPlugins(utils.determineType(msgArrs), msgArrs, false, sender)
     }
     fun callPlugins(type: MessageConstructor.Types, arg: Any, isPriv:Boolean, sender: Events.Sender){
-        for (registeredPluginClass in registeredPluginClasses) {
-            loader.call(registeredPluginClass, type, arg , isPriv, sender)
-        }
+        loader.call(type, arg , isPriv, sender)
     }
     fun priv(body: JSONObject) {
         val msgTypeObjs: JSONArray = body.getJSONArray("message")
