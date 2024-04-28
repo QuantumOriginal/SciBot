@@ -1,5 +1,3 @@
-package ind.glowingstone
-
 import org.jetbrains.annotations.Nullable
 
 class Events {

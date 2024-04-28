@@ -1,5 +1,5 @@
 import ind.glowingstone.Annonations
-import ind.glowingstone.Events
+import Events
 import ind.glowingstone.MessageConstructor
 import java.io.File
 import java.net.URL
@@ -70,7 +70,7 @@ class PluginManager(private val pluginDirectory: String) {
                         try {
                             method.javaMethod?.invoke(plugin, event)
                         } catch (e: Exception) {
-                            println("Error calling method ${method.name}: ${e.message}")
+                            println("Error calling method ${method.parameters}: ${e.message}")
                             e.printStackTrace()
                         }
                     }
@@ -81,7 +81,7 @@ class PluginManager(private val pluginDirectory: String) {
                         try {
                             method.call(plugin, event)
                         } catch (e: Exception) {
-                            println("Error calling method ${method.name}: ${e.message}")
+                            println("Error calling method ${method}: ${e.message}")
                             e.printStackTrace()
                         }
                     }
