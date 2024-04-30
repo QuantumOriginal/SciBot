@@ -31,10 +31,10 @@ class Logger(private val prefix: String) : Runnable {
         val coloredLogEntry = "$color[$levelName][$logTime][$prefix] $msg$RESET"
         val plainLogEntry = "[$levelName][$logTime][$prefix] $msg"
 
-        println(coloredLogEntry) // 控制台输出带颜色的日志
+        println(coloredLogEntry)
 
         synchronized(LogList) {
-            LogList.add(plainLogEntry) // 写入日志列表，确保没有颜色代码
+            LogList.add(plainLogEntry)
         }
     }
 
@@ -63,7 +63,7 @@ class Logger(private val prefix: String) : Runnable {
                         writer.write(log)
                         writer.newLine()
                     }
-                    LogList.clear() // 避免重复写入
+                    LogList.clear()
                 }
             }
         } catch (e: IOException) {
