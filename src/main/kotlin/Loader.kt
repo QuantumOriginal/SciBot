@@ -1,9 +1,6 @@
 package ind.glowingstone
 
 import PluginManager
-import java.sql.Types
-import kotlin.reflect.full.declaredFunctions
-import kotlin.reflect.full.findAnnotation
 
 class Loader {
     fun call(type: MessageConstructor.Types, arg: Any, isPrivate: Boolean, sender: Events.Sender) {

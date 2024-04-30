@@ -9,7 +9,8 @@ class Configurations {
     var configMap: HashMap<String, Any> = hashMapOf()
     val defaultConfigMap: HashMap<String, Any> = hashMapOf(
         "server_port" to 9912,
-        "upload_url" to "localhost:8080"
+        "upload_url" to "localhost:8080",
+        "log-dir" to "./logs",
     )
 
     init{

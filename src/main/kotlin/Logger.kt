@@ -1,67 +1,90 @@
-package ind.glowingstone
-
+import ind.glowingstone.Configurations
 import java.io.BufferedWriter
+import java.io.File
 import java.io.FileWriter
 import java.io.IOException
+import java.nio.file.Files
+import java.nio.file.Paths
 import java.text.SimpleDateFormat
+import java.time.LocalTime
 import java.util.*
+import java.util.Collections
+import java.util.logging.Level
 
-class Logger {
-    companion object {
-        private val logBuffer: MutableList<String> = mutableListOf()
-        private val lock = Any()
-        fun log(message: String?, level: LogLevel? = LogLevel.UNKNOWN) {
-            if (level == null) {
-                println("Log level cannot be null")
+class Logger(private val prefix: String) : Runnable {
+    private val RESET = "\u001B[0m"
+    private val RED = "\u001B[31m"
+    private val GREEN = "\u001B[32m"
+    private val YELLOW = "\u001B[33m"
+    private val BLUE = "\u001B[34m"
+    fun log(msg: String, level: Level) {
+        val dateFormat = SimpleDateFormat("yyyyMMdd_HHmmss")
+        val logTime = dateFormat.format(Date())
+
+        val (color, levelName) = when (level) {
+            Level.INFO -> GREEN to "INFO"
+            Level.WARNING -> YELLOW to "WARNING"
+            Level.SEVERE -> RED to "SEVERE"
+            else -> BLUE to "UNKNOWN"
+        }
+
+        val coloredLogEntry = "$color[$levelName][$logTime][$prefix] $msg$RESET"
+        val plainLogEntry = "[$levelName][$logTime][$prefix] $msg"
+
+        println(coloredLogEntry) // 控制台输出带颜色的日志
+
+        synchronized(LogList) {
+            LogList.add(plainLogEntry) // 写入日志列表，确保没有颜色代码
+        }
+    }
+
+    override fun run() {
+        val logPath = Paths.get(LogDir).toAbsolutePath()
+
+        if (Files.notExists(logPath) || !Files.isDirectory(logPath)) {
+            try {
+                Files.createDirectories(logPath)
+            } catch (e: IOException) {
+                println("Failed to create log directory: ${e.message}")
                 return
             }
-
-            val now = Date()
-            val sdf = SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
-            val timestamp = sdf.format(now)
-
-            val logEntry = String.format("[%s] [%s] %s", timestamp, level, message)
-
-            synchronized(lock) {
-                logBuffer.add(logEntry)
-            }
         }
 
-        fun startLogWriter(logFilePath: String?, intervalMillis: Long) {
-            if (logFilePath.isNullOrEmpty()) {
-                throw IllegalArgumentException("Log file path cannot be null or empty")
-            }
+        var logFile = getCurrentLogFile(logPath)
 
-            val timer = Timer(true)
-            timer.scheduleAtFixedRate(LogWriterTask(logFilePath), intervalMillis, intervalMillis)
+        if (logFile.length() > MAX_LOG_SIZE_MB * 1024 * 1024) {
+            logFile = createNewLogFile(logPath)
         }
 
-        enum class LogLevel {
-            INFO, WARNING, ERROR, UNKNOWN
-        }
-
-        private class LogWriterTask(private val logFilePath: String) : TimerTask() {
-            override fun run() {
-                val logsToWrite: List<String>
-
-                synchronized(lock) {
-                    logsToWrite = logBuffer.toList()
-                    logBuffer.clear()
-                }
-
-                if (logsToWrite.isNotEmpty()) {
-                    try {
-                        BufferedWriter(FileWriter(logFilePath, true)).use { writer ->
-                            logsToWrite.forEach { log ->
-                                writer.write("$log\n")
-                            }
-                        }
-                    } catch (e: IOException) {
-                        println("Error writing logs: ${e.message}")
-                        e.printStackTrace()
+        try {
+            BufferedWriter(FileWriter(logFile, true)).use { writer ->
+                synchronized(LogList) {
+                    LogList.forEach { log ->
+                        writer.write(log)
+                        writer.newLine()
                     }
+                    LogList.clear() // 避免重复写入
                 }
             }
+        } catch (e: IOException) {
+            println("Failed to write logs: ${e.message}")
+        }
+    }
+
+    companion object {
+        const val MAX_LOG_SIZE_MB = 100
+        val LogList: MutableList<String> = Collections.synchronizedList(ArrayList())
+        val LogDir: String = Configurations().get("log-dir").toString()
+
+        private fun getCurrentLogFile(logPath: java.nio.file.Path): File {
+            val logFiles = logPath.toFile().listFiles()?.sortedBy { it.name } ?: listOf()
+            return logFiles.lastOrNull() ?: createNewLogFile(logPath)
+        }
+
+        private fun createNewLogFile(logPath: java.nio.file.Path): File {
+            val dateFormat = SimpleDateFormat("yyyyMMdd_HHmmss")
+            val logFileName = "log_" + dateFormat.format(Date()) + ".txt"
+            return logPath.resolve(logFileName).toFile()
         }
     }
 }

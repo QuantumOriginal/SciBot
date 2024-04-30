@@ -1,10 +1,6 @@
 import ind.glowingstone.Annonations
-import Events
-import ind.glowingstone.MessageConstructor
 import java.io.File
-import java.net.URL
 import java.net.URLClassLoader
-import kotlin.reflect.KFunction
 import kotlin.reflect.full.createInstance
 import kotlin.reflect.full.declaredMemberFunctions
 import kotlin.reflect.full.findAnnotation
