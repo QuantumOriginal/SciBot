@@ -18,7 +18,7 @@ class Logger(private val prefix: String? = "") : Runnable, SimpleLogger {
     private val YELLOW = "\u001B[33m"
     private val BLUE = "\u001B[34m"
     override fun log(msg: String, level: Level) {
-        val dateFormat = SimpleDateFormat("yyyyMMdd_HHmmss")
+        val dateFormat = SimpleDateFormat("yyyyMMdd HH:mm:ss")
         val logTime = dateFormat.format(Date())
 
         val (color, levelName) = when (level) {
