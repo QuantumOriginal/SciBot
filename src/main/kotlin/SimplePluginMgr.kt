@@ -17,18 +17,19 @@ class PluginManager(private val pluginDirectory: String) {
 
     init {
         val pluginDir = File(pluginDirectory)
-        require(pluginDir.isDirectory) { "插件目录必须是一个文件夹" }
         val jarFiles = pluginDir.listFiles { _, name -> name.endsWith(".jar") }
-        require(!jarFiles.isNullOrEmpty()) { "插件目录中没有找到任何插件" }
-        val jarUrls = jarFiles.map { it.toURI().toURL() }.toTypedArray()
+        val jarUrls = jarFiles?.map { it.toURI().toURL() }?.toTypedArray()
         classLoader = URLClassLoader(jarUrls)
     }
     fun loadPlugins() {
         val pluginDir = File(pluginDirectory)
+        if(pluginDir.listFiles()?.size == 0) {
+            return
+        }
         val jarFiles = pluginDir.listFiles { _, name -> name.endsWith(".jar") }
         jarFiles?.forEach { jarFile ->
             try {
-                val pluginClass = classLoader.loadClass("MyPlugin")
+                val pluginClass = classLoader.loadClass("Plugin")
                 if (Plugin::class.java.isAssignableFrom(pluginClass)) {
                     val pluginInstance = pluginClass.kotlin.createInstance() as Plugin
                     loadedPlugins.add(pluginInstance)

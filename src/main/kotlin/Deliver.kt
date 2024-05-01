@@ -40,6 +40,10 @@ class Deliver{
                     val event: Events.PicMessage = Events.PicMessage(msgDetailObj.getString("url"))
                     msgArrs.add(event)
                 }
+                "video" -> {
+                    val event: Events.VideoMessage = Events.VideoMessage(msgDetailObj.getString("file"))
+                    msgArrs.add(event)
+                }
             }
         }
         val sender = Events.Sender(uid,nickname, role)
@@ -61,6 +65,10 @@ class Deliver{
                 }
                 "image" -> {
                     val event: Events.PicMessage = Events.PicMessage(msgDetailObj.getString("url"))
+                    msgArrs.add(event)
+                }
+                "video" -> {
+                    val event: Events.VideoMessage = Events.VideoMessage(msgDetailObj.getString("file"))
                     msgArrs.add(event)
                 }
             }
