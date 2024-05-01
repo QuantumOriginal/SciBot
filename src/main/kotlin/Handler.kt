@@ -1,5 +1,6 @@
 package ind.glowingstone
 
+import PluginManager
 import org.http4k.core.*
 import org.http4k.routing.bind
 import org.http4k.routing.routes
@@ -20,7 +21,7 @@ class Handler {
         return Response(Status.OK).body("")
     }
     private fun handleRunning(req: Request): Response {
-        val Body = "Sci-Bot project running. \n plugins(handlers) loaded."
+        val Body = "Sci-Bot project running. \n ${PluginManager.loadedPlugins.size} plugins(handlers) loaded."
         return Response(Status.OK).body(Body)
     }
     fun init() {

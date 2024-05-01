@@ -25,3 +25,6 @@ fun main(){
     web.init()
     pluginMgr.loadPlugins()
 }
+class Host{
+
+}

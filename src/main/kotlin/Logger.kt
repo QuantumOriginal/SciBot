@@ -11,13 +11,13 @@ import java.util.*
 import java.util.Collections
 import java.util.logging.Level
 
-class Logger(private val prefix: String) : Runnable {
+class Logger(private val prefix: String? = "") : Runnable, SimpleLogger {
     private val RESET = "\u001B[0m"
     private val RED = "\u001B[31m"
     private val GREEN = "\u001B[32m"
     private val YELLOW = "\u001B[33m"
     private val BLUE = "\u001B[34m"
-    fun log(msg: String, level: Level) {
+    override fun log(msg: String, level: Level) {
         val dateFormat = SimpleDateFormat("yyyyMMdd_HHmmss")
         val logTime = dateFormat.format(Date())
 
@@ -36,6 +36,9 @@ class Logger(private val prefix: String) : Runnable {
         synchronized(LogList) {
             LogList.add(plainLogEntry)
         }
+    }
+    fun getInstance(): Logger {
+        return this
     }
 
     override fun run() {

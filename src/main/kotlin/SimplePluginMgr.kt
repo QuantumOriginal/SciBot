@@ -1,4 +1,5 @@
 import ind.glowingstone.Annonations
+import ind.glowingstone.Host
 import java.io.File
 import java.net.URLClassLoader
 import kotlin.reflect.full.createInstance
@@ -8,11 +9,13 @@ import kotlin.reflect.jvm.isAccessible
 import kotlin.reflect.jvm.javaMethod
 
 interface Plugin {
-    fun start()
+    fun start(Logger: SimpleLogger)
 }
 
 class PluginManager(private val pluginDirectory: String) {
-    private val loadedPlugins = mutableListOf<Plugin>()
+    companion object{
+        val loadedPlugins = mutableListOf<Plugin>()
+    }
     private val classLoader: URLClassLoader
 
     init {
@@ -29,11 +32,12 @@ class PluginManager(private val pluginDirectory: String) {
         val jarFiles = pluginDir.listFiles { _, name -> name.endsWith(".jar") }
         jarFiles?.forEach { jarFile ->
             try {
-                val pluginClass = classLoader.loadClass("Plugin")
+                val pluginClass = classLoader.loadClass("MyPlugin")
                 if (Plugin::class.java.isAssignableFrom(pluginClass)) {
                     val pluginInstance = pluginClass.kotlin.createInstance() as Plugin
                     loadedPlugins.add(pluginInstance)
-                    pluginInstance.start()
+                    val logger:Logger = Logger("MyPlugin")
+                    pluginInstance.start(logger)
                 }
             } catch (e: Exception) {
                 println("无法加载插件 ${jarFile.name}: ${e.message}")
