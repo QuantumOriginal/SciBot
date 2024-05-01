@@ -1,7 +1,11 @@
 import ind.glowingstone.Annonations
 import ind.glowingstone.Host
-import java.io.File
+import org.yaml.snakeyaml.Yaml
+import java.io.*
 import java.net.URLClassLoader
+import java.util.Enumeration
+import java.util.jar.JarEntry
+import java.util.jar.JarFile
 import kotlin.reflect.full.createInstance
 import kotlin.reflect.full.declaredMemberFunctions
 import kotlin.reflect.full.findAnnotation
@@ -32,7 +36,7 @@ class PluginManager(private val pluginDirectory: String) {
         val jarFiles = pluginDir.listFiles { _, name -> name.endsWith(".jar") }
         jarFiles?.forEach { jarFile ->
             try {
-                val pluginClass = classLoader.loadClass("MyPlugin")
+                val pluginClass = classLoader.loadClass(loadPluginConfig("main-class", jarFile.toString()).toString())
                 if (Plugin::class.java.isAssignableFrom(pluginClass)) {
                     val pluginInstance = pluginClass.kotlin.createInstance() as Plugin
                     loadedPlugins.add(pluginInstance)
@@ -51,7 +55,7 @@ class PluginManager(private val pluginDirectory: String) {
                 .filter { it.findAnnotation<Annonations.PlainHandler>() != null }
 
             plainHandlerMethods.forEach { method ->
-                println("Method: ${method.name}, Parameters: ${method.parameters.map { it.type }}")
+                //println("Method: ${method.name}, Parameters: ${method.parameters.map { it.type }}")
             }
         }
 
@@ -93,5 +97,26 @@ class PluginManager(private val pluginDirectory: String) {
     enum class Annotype {
         PLAIN,
         ADVANCED
+    }
+
+    fun loadPluginConfig(key: String, jarPath: String): Any? {
+        val jarFile = JarFile(jarPath)
+        var configYmlRaw: String? = null
+        val entries: Enumeration<JarEntry> = jarFile.entries()
+        while (entries.hasMoreElements()) {
+            val entry = entries.nextElement()
+            if (entry.name == "plugin.yml") {
+                val inputStream = jarFile.getInputStream(entry)
+                configYmlRaw = BufferedReader(InputStreamReader(inputStream)).use { it.readText() }
+                break
+            }
+        }
+
+        if (configYmlRaw == null) {
+            throw IllegalArgumentException("Resource 'plugin.yml' not found in JAR: $jarPath")
+        }
+        val yamlParser = Yaml()
+        val configMap: Map<String, Any> = yamlParser.load(configYmlRaw)
+        return configMap[key]
     }
 }
