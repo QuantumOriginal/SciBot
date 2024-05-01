@@ -1,5 +1,6 @@
 import ind.glowingstone.Annonations
 import ind.glowingstone.Host
+import ind.glowingstone.MessageConstructor
 import org.yaml.snakeyaml.Yaml
 import java.io.*
 import java.net.URLClassLoader
@@ -40,7 +41,7 @@ class PluginManager(private val pluginDirectory: String) {
                 if (Plugin::class.java.isAssignableFrom(pluginClass)) {
                     val pluginInstance = pluginClass.kotlin.createInstance() as Plugin
                     loadedPlugins.add(pluginInstance)
-                    val logger:Logger = Logger("MyPlugin")
+                    val logger:Logger = Logger(loadPluginConfig("plugin-name", jarFile.toString()).toString())
                     pluginInstance.start(logger)
                 }
             } catch (e: Exception) {
@@ -49,7 +50,7 @@ class PluginManager(private val pluginDirectory: String) {
             }
         }
     }
-    fun invokePluginMethod(type: Annotype, event: Events.MajorEvent) {
+    fun invokePluginMethod(type: Annotype, event: Events.MajorEvent, args:MessageConstructor.Types) {
         loadedPlugins.forEach { plugin ->
             val plainHandlerMethods = plugin::class.declaredMemberFunctions
                 .filter { it.findAnnotation<Annonations.PlainHandler>() != null }
@@ -61,11 +62,11 @@ class PluginManager(private val pluginDirectory: String) {
 
         loadedPlugins.forEach { plugin ->
             val plainHandlerMethods = plugin::class.declaredMemberFunctions
-                .filter { it.findAnnotation<Annonations.PlainHandler>() != null }
+                .filter { (it.findAnnotation<Annonations.PlainHandler>() != null) && (it.findAnnotation<Annonations.PlainHandler>()!!.type == args) }
                 .map { it }
 
             val privateHandlerMethods = plugin::class.declaredMemberFunctions
-                .filter { it.findAnnotation<Annonations.PrivateHandler>() != null }
+                .filter { it.findAnnotation<Annonations.PrivateHandler>() != null && (it.findAnnotation<Annonations.PrivateHandler>()!!.type == args)}
                 .map { it }
 
             when (type) {
