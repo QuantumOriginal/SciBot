@@ -60,19 +60,21 @@ class PluginManager(private val pluginDirectory: String) {
                 .filter { it.findAnnotation<Annonations.PlainHandler>() != null }
 
             plainHandlerMethods.forEach { method ->
-                //println("Method: ${method.name}, Parameters: ${method.parameters.map { it.type }}")
+                println("Method: ${method.name}, Parameters: ${method.parameters.map { it.type }}")
             }
         }
 
         loadedPlugins.forEach { plugin ->
             val plainHandlerMethods = plugin::class.declaredMemberFunctions
-                .filter { (it.findAnnotation<Annonations.PlainHandler>() != null) && (it.findAnnotation<Annonations.PlainHandler>()!!.type == args) }
+                .filter { (it.findAnnotation<Annonations.PlainHandler>() != null)}
                 .map { it }
 
             val privateHandlerMethods = plugin::class.declaredMemberFunctions
-                .filter { it.findAnnotation<Annonations.PrivateHandler>() != null && (it.findAnnotation<Annonations.PrivateHandler>()!!.type == args)}
+                .filter { it.findAnnotation<Annonations.PrivateHandler>() != null}
                 .map { it }
-
+            plainHandlerMethods.forEach { method ->
+                println(method.name)
+            }
             when (type) {
                 Annotype.PLAIN -> {
                     plainHandlerMethods.forEach { method ->
