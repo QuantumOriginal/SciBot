@@ -1,4 +1,3 @@
-
 import ind.glowingstone.Configurations
 import ind.glowingstone.Host.Companion.QClient
 import ind.glowingstone.MessageConstructor
@@ -13,20 +12,22 @@ class Sender : SimpleSender {
     private val logger = Logger("Sender")
     private val messageConstructor = MessageConstructor()
     private val cfg = Configurations()
-    private fun sendAsync(request: org.http4k.core.Request, callback: (Response) -> Unit) {
-        GlobalScope.launch(Dispatchers.IO) {
+
+    private val ioDispatcher = SupervisorJob() + Dispatchers.IO
+    private val mainDispatcher = Dispatchers.Main
+
+    suspend fun sendAsync(request: org.http4k.core.Request): Response {
+        return withContext(ioDispatcher) {
             try {
-                val response = QClient(request)
-                withContext(Dispatchers.Main) {
-                    callback(response)
-                }
+                QClient(request)
             } catch (e: Exception) {
                 logger.log("Exception occurred while sending request: ${e.message}", Level.SEVERE)
+                throw e
             }
         }
     }
 
-    override fun send(
+    override suspend fun send(
         msgArrs: MutableList<MessageConstructor.MsgSeg>,
         operation: Type,
         id: Long
@@ -46,14 +47,13 @@ class Sender : SimpleSender {
         }
 
         val request = org.http4k.core.Request(Method.POST, urlEndpoint).body(msgObj.toString())
-        sendAsync(request) { response ->
-            if (response.status != Status.OK) {
-                logger.log("ERROR POST message to Server. Status: ${response.status}, Description: ${response.status.description}", Level.SEVERE)
-            }
+        val response = sendAsync(request)
+        if (response.status != Status.OK) {
+            logger.log("ERROR POST message to Server. Status: ${response.status}, Description: ${response.status.description}", Level.SEVERE)
         }
     }
 
-    override fun plainSend(content: String, operation: Type, id: Long) {
+    override suspend fun plainSend(content: String, operation: Type, id: Long) {
         val msgObj = JSONObject()
         val urlEndpoint: String = when (operation) {
             Type.PRIVATE -> "${cfg.get("upload_url")}/send_private_msg"
@@ -73,10 +73,9 @@ class Sender : SimpleSender {
         }
 
         val request = org.http4k.core.Request(Method.POST, urlEndpoint).body(msgObj.toString())
-        sendAsync(request) { response ->
-            if (response.status != Status.OK) {
-                logger.log("ERROR POST message to Server. Status: ${response.status}, Description: ${response.status.description}", Level.SEVERE)
-            }
+        val response = sendAsync(request)
+        if (response.status != Status.OK) {
+            logger.log("ERROR POST message to Server. Status: ${response.status}, Description: ${response.status.description}", Level.SEVERE)
         }
     }
 

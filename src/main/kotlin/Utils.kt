@@ -23,6 +23,10 @@ class Utils {
         return when {
             list.any { it is Events.AtMessage } -> MessageConstructor.Types.AT
             list.any { it is Events.PicMessage } -> MessageConstructor.Types.IMG
+            list.any { it is Events.VideoMessage } -> MessageConstructor.Types.VIDEO
+            list.any { it is Events.FaceMessage } -> MessageConstructor.Types.FACE
+            list.any { it is Events.ReplyMessage } -> MessageConstructor.Types.REPLY
+            list.any { it is Events.RecordMessage } -> MessageConstructor.Types.RECORD
             else -> MessageConstructor.Types.PLAIN
         }
     }
