@@ -17,7 +17,7 @@ val printResponseBodyFilter = Filter { next ->
 val client: HttpHandler = JavaHttpClient()
 fun main(){
     val cfg: Configurations = Configurations();
-    val web: Handler = Handler()
+    val web = Handler()
     val pluginMgr = PluginManager("plugins")
     web.init()
     pluginMgr.loadPlugins()

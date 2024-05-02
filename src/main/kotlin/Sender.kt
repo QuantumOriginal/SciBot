@@ -1,5 +1,4 @@
-import Logger
-import SimpleSender
+
 import ind.glowingstone.Configurations
 import ind.glowingstone.Host.Companion.QClient
 import ind.glowingstone.MessageConstructor
