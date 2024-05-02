@@ -35,6 +35,20 @@ class MessageConstructor {
         }
         return msgArr
     }
+    fun factory(vararg msgs: MsgSeg): JSONArray {
+        if (msgs.isEmpty()) {
+            throw IllegalArgumentException("Message segments cannot be empty")
+        }
+
+        val msgArr = JSONArray()
+        for (msg in msgs) {
+            val msgObj = createMsgObj(msg.type)
+            val dataObj = createDataObj(msg.type, msg.msg)
+            msgObj.put("data", dataObj)
+            msgArr.put(msgObj)
+        }
+        return msgArr
+    }
 
     private fun createMsgObj(type: Types): JSONObject {
         val msgObj = JSONObject()
