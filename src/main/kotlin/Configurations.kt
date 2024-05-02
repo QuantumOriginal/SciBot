@@ -17,6 +17,7 @@ class Configurations {
         "server_port" to 9912,
         "upload_url" to "localhost:8080",
         "log-dir" to "./logs",
+        "debug" to false
     )
 
     init {

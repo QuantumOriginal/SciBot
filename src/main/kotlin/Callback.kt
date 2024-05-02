@@ -3,6 +3,7 @@ import java.util.logging.Level
 
 interface SimpleLogger{
     fun log(msg: String, level: Level? = Level.INFO)
+    fun debug(msg: String)
 }
 interface SimpleSender{
     suspend fun plainSend(content: String, operation: Sender.Type, id: Long)

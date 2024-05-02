@@ -24,8 +24,15 @@ class Handler {
         return Response(Status.OK).body("")
     }
     private fun handleRunning(req: Request): Response {
-        val Body = "Sci-Bot project running. \n ${PluginManager.loadedPlugins.size} plugins(handlers) loaded."
-        return Response(Status.OK).body(Body)
+        val Body = StringBuilder("Sci-Bot project running. \n ${PluginManager.loadedPlugins.size} plugins(handlers) loaded. \n Disabled plugin:")
+        if (PluginManager.disabledPlugins.size == 0){
+            Body.append("NO DISABLED PLUGINS."+ "\n")
+        } else {
+            PluginManager.disabledPlugins.forEach() {
+                Body.append(it + "\n")
+            }
+        }
+        return Response(Status.OK).body(Body.toString())
     }
     fun init() {
         val handler = app

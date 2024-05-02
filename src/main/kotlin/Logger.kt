@@ -1,4 +1,5 @@
 import ind.glowingstone.Configurations
+import ind.glowingstone.Host
 import java.io.BufferedWriter
 import java.io.File
 import java.io.FileWriter
@@ -12,6 +13,7 @@ import java.util.Collections
 import java.util.logging.Level
 
 class Logger(private val prefix: String? = "") : Runnable, SimpleLogger {
+    val config = Host.configInstance
     private val RESET = "\u001B[0m"
     private val RED = "\u001B[31m"
     private val GREEN = "\u001B[32m"
@@ -37,6 +39,25 @@ class Logger(private val prefix: String? = "") : Runnable, SimpleLogger {
             LogList.add(plainLogEntry)
         }
     }
+
+    override fun debug(msg: String) {
+        if (config.get("debug") as Boolean){
+            val dateFormat = SimpleDateFormat("yyyyMMdd HH:mm:ss")
+            val logTime = dateFormat.format(Date())
+
+            val (color, levelName) = BLUE to "DEBUG"
+
+            val coloredLogEntry = "$color[$levelName][$logTime][$prefix] $msg$RESET"
+            val plainLogEntry = "[$levelName][$logTime][$prefix] $msg"
+
+            println(coloredLogEntry)
+
+            synchronized(LogList) {
+                LogList.add(plainLogEntry)
+            }
+        }
+    }
+
     fun getInstance(): Logger {
         return this
     }

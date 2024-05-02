@@ -1,4 +1,4 @@
-import ind.glowingstone.Annonations
+import Annonations
 import ind.glowingstone.Host
 import ind.glowingstone.MessageConstructor
 import org.yaml.snakeyaml.Yaml
@@ -23,17 +23,30 @@ class PluginManager(private val pluginDirectory: String) {
     val logger:Logger = Logger("PLUGIN_MANAGER")
     companion object{
         val loadedPlugins = mutableListOf<Plugin>()
+        val disabledPlugins = mutableListOf<String>()
     }
+    val pluginDir = File(pluginDirectory)
     private val classLoader: URLClassLoader
-
+    val disabledJarFiles = pluginDir.listFiles { _, name -> name.endsWith(".disabled")}
+    val disabledJarUrls = disabledJarFiles?.map { it.toURI().toURL() }?.toTypedArray()
     init {
-        val pluginDir = File(pluginDirectory)
         val jarFiles = pluginDir.listFiles { _, name -> name.endsWith(".jar") }
         val jarUrls = jarFiles?.map { it.toURI().toURL() }?.toTypedArray()
         classLoader = URLClassLoader(jarUrls)
     }
-    fun loadPlugins() {
+    fun getDisabledPlugins(){
         val pluginDir = File(pluginDirectory)
+        disabledJarFiles?.forEach { jarFile ->
+            try {
+                val pluginName = loadPluginConfig("plugin-name", jarFile.toString()).toString()
+                disabledPlugins.add(pluginName)
+            } catch (e: Exception) {
+                logger.log("无法确认被禁用插件的信息 ${jarFile.name}: ${e.message}")
+                e.printStackTrace()
+            }
+        }
+    }
+    fun loadPlugins() {
         if(pluginDir.listFiles()?.size == 0) {
             return
         }
@@ -54,46 +67,53 @@ class PluginManager(private val pluginDirectory: String) {
             }
         }
     }
-    fun invokePluginMethod(type: Annotype, event: Events.MajorEvent, args:MessageConstructor.Types) {
+    fun invokePluginMethod(type: Annotype, event: Events.MajorEvent, args: MessageConstructor.Types) {
+        logger.debug("Loaded plugins: ${loadedPlugins.size}")
+
         loadedPlugins.forEach { plugin ->
             val plainHandlerMethods = plugin::class.declaredMemberFunctions
                 .filter { it.findAnnotation<Annonations.PlainHandler>() != null }
 
-            plainHandlerMethods.forEach { method ->
-                println("Method: ${method.name}, Parameters: ${method.parameters.map { it.type }}")
-            }
-        }
+            logger.debug("PlainHandler methods: ${plainHandlerMethods.size}")
 
-        loadedPlugins.forEach { plugin ->
-            val plainHandlerMethods = plugin::class.declaredMemberFunctions
-                .filter { (it.findAnnotation<Annonations.PlainHandler>() != null)}
-                .map { it }
+            plainHandlerMethods.forEach { method ->
+                logger.debug("Checking PlainHandler method: ${method.name}()")
+            }
 
             val privateHandlerMethods = plugin::class.declaredMemberFunctions
                 .filter { it.findAnnotation<Annonations.PrivateHandler>() != null}
-                .map { it }
-            plainHandlerMethods.forEach { method ->
-                println(method.name)
+
+            logger.debug("PrivateHandler methods: ${privateHandlerMethods.size}")
+
+            privateHandlerMethods.forEach { method ->
+                logger.debug("Checking PrivateHandler method: ${method.name}()")
             }
+
             when (type) {
                 Annotype.PLAIN -> {
+                    logger.debug("Invoking PlainHandler methods")
+
                     plainHandlerMethods.forEach { method ->
                         method.isAccessible = true
                         try {
+                            logger.debug("Invoking method ${method.name}() with parameters ${method.parameters.map { it.type }}")
                             method.javaMethod?.invoke(plugin, event)
                         } catch (e: Exception) {
-                            logger.log("Error calling method ${method.parameters}: ${e.message}", SEVERE)
+                            logger.log("Error calling method ${method.name}(): ${e.message}", SEVERE)
                             e.printStackTrace()
                         }
                     }
                 }
                 Annotype.ADVANCED -> {
+                    logger.debug("Invoking PrivateHandler methods")
+
                     privateHandlerMethods.forEach { method ->
                         method.isAccessible = true
                         try {
+                            logger.debug("Invoking method ${method.name}() with parameters ${method.parameters.map { it.type }}")
                             method.call(plugin, event)
                         } catch (e: Exception) {
-                            logger.log("Error calling method ${method}: ${e.message}", SEVERE)
+                            logger.log("Error calling method ${method.name}(): ${e.message}", SEVERE)
                             e.printStackTrace()
                         }
                     }
@@ -101,6 +121,7 @@ class PluginManager(private val pluginDirectory: String) {
             }
         }
     }
+
     enum class Annotype {
         PLAIN,
         ADVANCED
