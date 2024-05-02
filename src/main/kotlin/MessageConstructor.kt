@@ -1,4 +1,5 @@
 package ind.glowingstone
+
 import org.json.JSONArray
 import org.json.JSONObject
 
@@ -13,14 +14,18 @@ class MessageConstructor {
         SHARE,
         REPLY
     }
+
     data class MsgSeg(val type: Types, val msg: String)
 
     fun create(type: Types, msg: String): MsgSeg {
         return MsgSeg(type, msg)
     }
 
-    fun factory(vararg msgs: MsgSeg): JSONArray {
-        if (msgs.isEmpty()) throw IllegalArgumentException("msgs cannot be empty")
+    fun factory(msgs: Collection<MsgSeg>): JSONArray {
+        if (msgs.isEmpty()) {
+            throw IllegalArgumentException("Message segments cannot be empty")
+        }
+
         val msgArr = JSONArray()
         for (msg in msgs) {
             val msgObj = createMsgObj(msg.type)
@@ -30,17 +35,20 @@ class MessageConstructor {
         }
         return msgArr
     }
+
     private fun createMsgObj(type: Types): JSONObject {
         val msgObj = JSONObject()
         msgObj.put("type", getMessageType(type))
         return msgObj
     }
+
     private fun createDataObj(type: Types, msg: String): JSONObject {
         val dataObj = JSONObject()
         val dataFieldName = getConsts(type)
         dataObj.put(dataFieldName, msg)
         return dataObj
     }
+
     private fun getMessageType(type: Types): String {
         return when (type) {
             Types.PLAIN -> "text"
@@ -53,6 +61,7 @@ class MessageConstructor {
             Types.REPLY -> "reply"
         }
     }
+
     private fun getConsts(type: Types): String {
         return when (type) {
             Types.PLAIN -> "text"

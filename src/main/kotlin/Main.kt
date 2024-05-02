@@ -1,8 +1,6 @@
 package ind.glowingstone
 
 import PluginManager
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.runBlocking
 import org.http4k.client.JavaHttpClient
 import org.http4k.core.Filter
 import org.http4k.core.HttpHandler
@@ -26,5 +24,7 @@ fun main(){
     pluginMgr.loadPlugins()
 }
 class Host{
-
+    companion object{
+        val HOST_VERSION = 0.1
+    }
 }

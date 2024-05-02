@@ -12,10 +12,10 @@ class Loader {
         val event : Events.MajorEvent = Events.MajorEvent(sender,arg)
         val plmgr = PluginManager("plugins")
         if (isPrivate){
-            plmgr.invokePluginMethod(PluginManager.Annotype.ADVANCED,event)
+            plmgr.invokePluginMethod(PluginManager.Annotype.ADVANCED,event,type)
         }
         else {
-            plmgr.invokePluginMethod(PluginManager.Annotype.PLAIN, event)
+            plmgr.invokePluginMethod(PluginManager.Annotype.PLAIN, event,type)
         }
 
     }
