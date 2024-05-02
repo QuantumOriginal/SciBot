@@ -16,7 +16,7 @@ import kotlin.reflect.jvm.isAccessible
 import kotlin.reflect.jvm.javaMethod
 
 interface Plugin {
-    fun start(Logger: SimpleLogger)
+    fun start(Logger: SimpleLogger, sender: SimpleSender)
 }
 
 class PluginManager(private val pluginDirectory: String) {
@@ -45,7 +45,8 @@ class PluginManager(private val pluginDirectory: String) {
                     val pluginInstance = pluginClass.kotlin.createInstance() as Plugin
                     loadedPlugins.add(pluginInstance)
                     val logger: Logger = Logger(loadPluginConfig("plugin-name", jarFile.toString()).toString())
-                    pluginInstance.start(logger)
+                    val sender: Sender = Sender()
+                    pluginInstance.start(logger,sender)
                 }
             } catch (e: Exception) {
                 logger.log("无法加载插件 ${jarFile.name}: ${e.message}")

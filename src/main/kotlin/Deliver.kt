@@ -37,8 +37,15 @@ class Deliver{
                     msgArrs.add(event)
                 }
                 "image" -> {
-                    val event: Events.PicMessage = Events.PicMessage(msgDetailObj.getString("url"))
-                    msgArrs.add(event)
+                    var event: Events.PicMessage? = null
+                        if (msgDetailObj.getBoolean("isFlash")) {
+                        event= Events.PicMessage(msgDetailObj.getString("url"), true)
+                    } else {
+                        event= Events.PicMessage(msgDetailObj.getString("url"), false)
+                    }
+                    if (event != null) {
+                        msgArrs.add(event)
+                    }
                 }
                 "video" -> {
                     val event: Events.VideoMessage = Events.VideoMessage(msgDetailObj.getString("file"))
@@ -64,8 +71,15 @@ class Deliver{
                     msgArrs.add(event)
                 }
                 "image" -> {
-                    val event: Events.PicMessage = Events.PicMessage(msgDetailObj.getString("url"))
-                    msgArrs.add(event)
+                    var event: Events.PicMessage? = null
+                    if (msgDetailObj.getBoolean("isFlash")) {
+                        event= Events.PicMessage(msgDetailObj.getString("url"), true)
+                    } else {
+                        event= Events.PicMessage(msgDetailObj.getString("url"), false)
+                    }
+                    if (event != null) {
+                        msgArrs.add(event)
+                    }
                 }
                 "video" -> {
                     val event: Events.VideoMessage = Events.VideoMessage(msgDetailObj.getString("file"))

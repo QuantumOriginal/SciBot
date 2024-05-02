@@ -6,5 +6,5 @@ interface SimpleLogger{
 }
 interface SimpleSender{
     suspend fun plainSend(content: String, operation: Sender.Type, id: Long)
-    suspend fun send(msgArrs: MutableList<MessageConstructor.MsgSeg>, operation: Sender.Type, id: Long)
+    suspend fun send(msgArrs: MutableList<Any>, operation: Sender.Type, id: Long)
 }

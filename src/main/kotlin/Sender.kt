@@ -28,7 +28,7 @@ class Sender : SimpleSender {
     }
 
     override suspend fun send(
-        msgArrs: MutableList<MessageConstructor.MsgSeg>,
+        msgArrs: MutableList<Any>,
         operation: Type,
         id: Long
     ) {
@@ -60,8 +60,8 @@ class Sender : SimpleSender {
             Type.GROUP -> "${cfg.get("upload_url")}/send_group_msg"
         }
 
-        val emptyArr: MutableList<MessageConstructor.MsgSeg> = mutableListOf(
-            MessageConstructor.MsgSeg(MessageConstructor.Types.PLAIN, content)
+        val emptyArr: MutableList<Any> = mutableListOf(
+            Events.PlainMessage(content)
         )
 
         msgObj.put("message", messageConstructor.factory(emptyArr))
