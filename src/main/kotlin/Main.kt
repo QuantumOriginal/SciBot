@@ -15,7 +15,6 @@ val printResponseBodyFilter = Filter { next ->
     }
 }
 val client: HttpHandler = JavaHttpClient()
-val QClient = printResponseBodyFilter.then(client)
 fun main(){
     val cfg: Configurations = Configurations();
     val web: Handler = Handler()
@@ -26,5 +25,6 @@ fun main(){
 class Host{
     companion object{
         val HOST_VERSION = 0.1
+        val QClient = printResponseBodyFilter.then(client)
     }
 }
