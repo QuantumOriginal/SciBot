@@ -16,7 +16,7 @@ import kotlin.reflect.jvm.isAccessible
 import kotlin.reflect.jvm.javaMethod
 
 interface Plugin {
-    fun start(Logger: SimpleLogger, sender: SimpleSender)
+    suspend fun start(Logger: SimpleLogger, sender: SimpleSender)
 }
 
 class PluginManager(private val pluginDirectory: String) {
@@ -46,7 +46,7 @@ class PluginManager(private val pluginDirectory: String) {
             }
         }
     }
-    fun loadPlugins() {
+    suspend fun loadPlugins() {
         if(pluginDir.listFiles()?.size == 0) {
             return
         }

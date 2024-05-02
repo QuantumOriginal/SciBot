@@ -33,9 +33,14 @@ class Sender : SimpleSender {
         id: Long
     ) {
         val msgObj = JSONObject()
-        val urlEndpoint: String = when (operation) {
-            Type.PRIVATE -> "${cfg.get("upload_url")}/send_private_msg"
-            Type.GROUP -> "${cfg.get("upload_url")}/send_group_msg"
+        val accessToken = if (cfg.get("auth")?.equals("YOUR_KEY_HERE") == true) {
+            ""
+        } else {
+            "?access_token=${cfg.get("auth")}"
+        }
+        val urlEndpoint = when (operation) {
+            Type.PRIVATE -> "${cfg.get("upload_url")}/send_private_msg$accessToken"
+            Type.GROUP -> "${cfg.get("upload_url")}/send_group_msg$accessToken"
         }
 
         msgObj.put("message", messageConstructor.factory(msgArrs))
@@ -55,9 +60,14 @@ class Sender : SimpleSender {
 
     override suspend fun plainSend(content: String, operation: Type, id: Long) {
         val msgObj = JSONObject()
-        val urlEndpoint: String = when (operation) {
-            Type.PRIVATE -> "${cfg.get("upload_url")}/send_private_msg"
-            Type.GROUP -> "${cfg.get("upload_url")}/send_group_msg"
+        val accessToken = if (cfg.get("auth")?.equals("YOUR_KEY_HERE") == true) {
+            ""
+        } else {
+            "?access_token=${cfg.get("auth")}"
+        }
+        val urlEndpoint = when (operation) {
+            Type.PRIVATE -> "${cfg.get("upload_url")}/send_private_msg$accessToken"
+            Type.GROUP -> "${cfg.get("upload_url")}/send_group_msg$accessToken"
         }
 
         val emptyArr: MutableList<Any> = mutableListOf(

@@ -11,6 +11,7 @@ import org.http4k.core.Request
 import org.http4k.core.then
 import java.io.ObjectInputFilter.Config
 import java.lang.invoke.MethodHandles.loop
+import java.util.logging.Level
 
 val printResponseBodyFilter = Filter { next ->
     { request: Request ->
@@ -20,15 +21,18 @@ val printResponseBodyFilter = Filter { next ->
     }
 }
 val client: HttpHandler = JavaHttpClient()
-fun main(){
+suspend fun main(){
     val logger: Logger = Logger("MAIN")
     val cfg: Configurations = Configurations();
     val web = Handler()
+    if (cfg.get("auth")?.equals("YOUR_KEY_HERE") == true){
+        logger.log("Warning: Sci-Bot is starting without an auth key. Requests without an auth key may be vulnerable.", Level.WARNING)
+    }
     val pluginMgr = PluginManager("plugins")
     Host.pluginMgr = pluginMgr
     web.init()
     val deliver = Deliver()
-    Host.pluginMgr!!.getDisabledPlugins() //get Disabled Plugins Information
+    Host.pluginMgr!!.getDisabledPlugins()
     Host.pluginMgr!!.loadPlugins()
 }
 class Host{
