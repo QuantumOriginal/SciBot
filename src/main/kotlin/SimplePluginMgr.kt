@@ -7,6 +7,8 @@ import java.net.URLClassLoader
 import java.util.Enumeration
 import java.util.jar.JarEntry
 import java.util.jar.JarFile
+import java.util.logging.Level
+import java.util.logging.Level.SEVERE
 import kotlin.reflect.full.createInstance
 import kotlin.reflect.full.declaredMemberFunctions
 import kotlin.reflect.full.findAnnotation
@@ -18,6 +20,7 @@ interface Plugin {
 }
 
 class PluginManager(private val pluginDirectory: String) {
+    val logger:Logger = Logger("PLUGIN_MANAGER")
     companion object{
         val loadedPlugins = mutableListOf<Plugin>()
     }
@@ -41,11 +44,11 @@ class PluginManager(private val pluginDirectory: String) {
                 if (Plugin::class.java.isAssignableFrom(pluginClass)) {
                     val pluginInstance = pluginClass.kotlin.createInstance() as Plugin
                     loadedPlugins.add(pluginInstance)
-                    val logger:Logger = Logger(loadPluginConfig("plugin-name", jarFile.toString()).toString())
+                    val logger: Logger = Logger(loadPluginConfig("plugin-name", jarFile.toString()).toString())
                     pluginInstance.start(logger)
                 }
             } catch (e: Exception) {
-                println("无法加载插件 ${jarFile.name}: ${e.message}")
+                logger.log("无法加载插件 ${jarFile.name}: ${e.message}")
                 e.printStackTrace()
             }
         }
@@ -76,7 +79,7 @@ class PluginManager(private val pluginDirectory: String) {
                         try {
                             method.javaMethod?.invoke(plugin, event)
                         } catch (e: Exception) {
-                            println("Error calling method ${method.parameters}: ${e.message}")
+                            logger.log("Error calling method ${method.parameters}: ${e.message}", SEVERE)
                             e.printStackTrace()
                         }
                     }
@@ -87,7 +90,7 @@ class PluginManager(private val pluginDirectory: String) {
                         try {
                             method.call(plugin, event)
                         } catch (e: Exception) {
-                            println("Error calling method ${method}: ${e.message}")
+                            logger.log("Error calling method ${method}: ${e.message}", SEVERE)
                             e.printStackTrace()
                         }
                     }

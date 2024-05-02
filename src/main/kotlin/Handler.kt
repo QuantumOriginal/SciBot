@@ -1,13 +1,16 @@
 package ind.glowingstone
 
+import Logger
 import PluginManager
 import org.http4k.core.*
 import org.http4k.routing.bind
 import org.http4k.routing.routes
 import org.http4k.server.SunHttp
 import org.http4k.server.asServer
+import java.util.logging.Level.INFO
 
 class Handler {
+    val logger: Logger = Logger("BACKEND")
     private val app: HttpHandler = routes(
         "/upload" bind Method.POST to ::handleUpload,
         "/" bind Method.GET to ::handleRunning
@@ -28,6 +31,6 @@ class Handler {
         val handler = app
         val cfg = Configurations()
         val server = handler.asServer(SunHttp(cfg.get("server_port") as Int)).start()
-        println("Backend Service started on port ${server.port()}.")
+        logger.log("Backend Service started on port ${server.port()}.", INFO)
     }
 }
