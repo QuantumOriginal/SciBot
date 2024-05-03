@@ -7,27 +7,50 @@
 ```Kotlin
 import ind.glowingstone.MessageConstructor
 import java.util.logging.Level
+
 class PluginMain : Plugin {
-    override fun start(logger: SimpleLogger) {
-        logger.log("Hello,World", Level.INFO)
+    var sender: SimpleSender? = null
+    var logger: SimpleLogger? = null
+    /*
+    This is the sample plugin of SciBot.
+    Define Main class and Plugin Name in resources/plugin.yml
+    use @PlainHandler to create an event handler.
+    implements Plugin interface to create a main class.
+     */
+    override suspend fun start(logger: SimpleLogger, sender: SimpleSender) {
+        logger.log("hello,World", Level.INFO)
+        this.sender = sender
+        this.logger = logger
+        sender.plainSend("hello,world", Sender.Type.GROUP,10000)
     }
     @Annonations.PlainHandler(MessageConstructor.Types.PLAIN)
     fun doSomething(event: Events.MajorEvent) {
-        println("recived plain message")
-        println("recived: ${event.message}")
+        println("MyPlugin called")
+        for (any in event.msgArr) {
+            if(any is Events.PlainMessage) {
+                println("recived message: ${any.message} from ${event.sender.uid}")
+            }
+        }
     }
 }
 ```
 它支持根据类型监听Bot事件，私聊/群消息获取/发送，基于插件的可拓展功能。
 同时，本后端提供了MessageConstructor来快速组装消息段。
 ```Kotlin
-messageConstructor.factory(MessageConstructor.MsgSeg(MessageConstructor.Types.PLAIN, content)
+val simpleArr: MutableList<Any> = mutableListOf(
+    Events.PlainMessage("你好，世界")
+)
+messageConstructor.factory(simpleArr)
 ```
 使用这个函数来快速将多个不同类型的Segments结合到一起。
 支持基于yml的个性化config:
 ```yml
-server_port: 8080,
-upload_url: localhost:8080,
-log-dir: "./logs",
+configuration_version: 0.1, 
+server_port: 25565,
+upload_url: 'http://localhost:8080',
+log-dir: ./logs, 
+debug: true, 
+auth: 123456
+
 ```
 更多插件API正在开发中，该项目由于没有完全实现Onebot的所有Message处理而暂未处于可用阶段，您可以选择先行自行编译来体验部分功能。
