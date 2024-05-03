@@ -1,7 +1,7 @@
 package ind.glowingstone
 import org.json.JSONArray
 import org.json.JSONObject
-
+import User
 class Deliver{
     val loader = Loader()
     val utils = Utils()
@@ -53,10 +53,10 @@ class Deliver{
                 }
             }
         }
-        val sender = Events.Sender(uid,nickname, role)
+        val sender = User.Sender(uid, nickname, role)
         callPlugins(utils.determineType(msgArrs), msgArrs, false, sender)
     }
-    fun callPlugins(type: MessageConstructor.Types, arg: Any, isPriv:Boolean, sender: Events.Sender){
+    fun callPlugins(type: MessageConstructor.Types, arg: MutableList<Any>, isPriv:Boolean, sender: User.Sender){
         loader.call(type, arg , isPriv, sender)
     }
     fun priv(body: JSONObject) {
@@ -90,7 +90,7 @@ class Deliver{
         val senderObj = body.getJSONObject("sender")
         val uid: Long = senderObj.getLong("user_id")
         val nickname: String = senderObj.getString("nickname")
-        val sender: Events.Sender = Events.Sender(uid,nickname)
+        val sender: User.Sender = User.Sender(uid, nickname)
         callPlugins(utils.determineType(msgArrs), msgArrs, true, sender)
     }
 }

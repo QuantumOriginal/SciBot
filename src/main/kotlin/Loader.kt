@@ -3,7 +3,7 @@ package ind.glowingstone
 import PluginManager
 
 class Loader {
-    fun call(type: MessageConstructor.Types, arg: Any, isPrivate: Boolean, sender: Events.Sender) {
+    fun call(type: MessageConstructor.Types, arg: MutableList<Any>, isPrivate: Boolean, sender: User.Sender) {
         /*
         A Listener should handle:
         A arrayList contains a list of message events

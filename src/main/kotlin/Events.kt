@@ -7,6 +7,8 @@ class Events {
     data class FaceMessage(val id: Int)
     data class VideoMessage(val url: String)
     data class PlainMessage(val message: String)
+    data class MajorEvent(val sender: User.Sender, val msgArr:MutableList<Any>)
+}
+class User{
     data class Sender(val uid:Long , val nickname:String, val role:String? = "private")
-    data class MajorEvent(val sender: Sender, val msgArr:MutableList<Any>)
 }
