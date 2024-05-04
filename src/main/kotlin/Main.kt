@@ -32,8 +32,8 @@ suspend fun main(){
     Host.pluginMgr = pluginMgr
     web.init()
     val deliver = Deliver()
-    Host.pluginMgr!!.getDisabledPlugins()
-    Host.pluginMgr!!.loadPlugins()
+    pluginMgr.getDisabledPlugins()
+    pluginMgr.loadPlugins()
 }
 class Host{
     companion object{
