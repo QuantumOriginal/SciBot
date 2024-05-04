@@ -11,6 +11,7 @@ import java.time.LocalTime
 import java.util.*
 import java.util.Collections
 import java.util.logging.Level
+import java.util.logging.Level.INFO
 
 class Logger(private val prefix: String? = "") : Runnable, SimpleLogger {
     val config = Host.configInstance
@@ -22,8 +23,9 @@ class Logger(private val prefix: String? = "") : Runnable, SimpleLogger {
     override fun log(msg: String, level: Level?) {
         val dateFormat = SimpleDateFormat("yyyyMMdd HH:mm:ss")
         val logTime = dateFormat.format(Date())
-
-        val (color, levelName) = when (level) {
+        var lvl = level
+        if (lvl == null) lvl = INFO
+        val (color, levelName) = when (lvl) {
             Level.INFO -> GREEN to "INFO"
             Level.WARNING -> YELLOW to "WARNING"
             Level.SEVERE -> RED to "SEVERE"

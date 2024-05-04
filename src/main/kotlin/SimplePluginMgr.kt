@@ -1,5 +1,4 @@
-import Annonations
-import ind.glowingstone.Host
+import Logger
 import ind.glowingstone.MessageConstructor
 import org.yaml.snakeyaml.Yaml
 import java.io.*
@@ -7,7 +6,6 @@ import java.net.URLClassLoader
 import java.util.Enumeration
 import java.util.jar.JarEntry
 import java.util.jar.JarFile
-import java.util.logging.Level
 import java.util.logging.Level.SEVERE
 import kotlin.reflect.full.createInstance
 import kotlin.reflect.full.declaredMemberFunctions
@@ -20,7 +18,7 @@ interface Plugin {
 }
 
 class PluginManager(private val pluginDirectory: String) {
-    val logger:Logger = Logger("PLUGIN_MANAGER")
+    val logger: Logger = Logger("PluginManager")
     companion object{
         val loadedPlugins = mutableListOf<Plugin>()
         val disabledPlugins = mutableListOf<String>()
@@ -33,6 +31,7 @@ class PluginManager(private val pluginDirectory: String) {
         val jarFiles = pluginDir.listFiles { _, name -> name.endsWith(".jar") }
         val jarUrls = jarFiles?.map { it.toURI().toURL() }?.toTypedArray()
         classLoader = URLClassLoader(jarUrls)
+        logger.log("Started.")
     }
     fun getDisabledPlugins(){
         val pluginDir = File(pluginDirectory)
@@ -68,7 +67,7 @@ class PluginManager(private val pluginDirectory: String) {
         }
     }
     fun invokePluginMethod(type: Annotype, event: Events.MajorEvent, args: MessageConstructor.Types) {
-        logger.debug("Loaded plugins: ${loadedPlugins.size}")
+        logger.log("Loaded plugins: ${loadedPlugins.size}")
 
         loadedPlugins.forEach { plugin ->
             val plainHandlerMethods = plugin::class.declaredMemberFunctions
