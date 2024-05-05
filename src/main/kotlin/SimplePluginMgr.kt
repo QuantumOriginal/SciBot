@@ -61,7 +61,7 @@ class PluginManager(private val pluginDirectory: String) {
                     pluginInstance.start(logger,sender)
                 }
             } catch (e: Exception) {
-                logger.log("无法加载插件 ${jarFile.name}: ${e.message}")
+                logger.log("插件 ${jarFile.name}的start方法出现错误: ${e.message}")
                 e.printStackTrace()
             }
         }

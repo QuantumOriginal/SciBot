@@ -1,3 +1,6 @@
+import Logger.Companion.LogDir
+import Logger.Companion.LogList
+import Logger.Companion.MAX_LOG_SIZE_MB
 import ind.glowingstone.Configurations
 import ind.glowingstone.Host
 import java.io.BufferedWriter
@@ -13,7 +16,7 @@ import java.util.Collections
 import java.util.logging.Level
 import java.util.logging.Level.INFO
 
-class Logger(private val prefix: String? = "") : Runnable, SimpleLogger {
+class Logger(private val prefix: String? = "") : SimpleLogger {
     val config = Host.configInstance
     private val RESET = "\u001B[0m"
     private val RED = "\u001B[31m"
@@ -31,7 +34,6 @@ class Logger(private val prefix: String? = "") : Runnable, SimpleLogger {
             Level.SEVERE -> RED to "SEVERE"
             else -> BLUE to "UNKNOWN"
         }
-
         val coloredLogEntry = "$color[$levelName][$logTime][$prefix] $msg$RESET"
         val plainLogEntry = "[$levelName][$logTime][$prefix] $msg"
 
@@ -64,6 +66,13 @@ class Logger(private val prefix: String? = "") : Runnable, SimpleLogger {
         return this
     }
 
+    companion object {
+        const val MAX_LOG_SIZE_MB = 100
+        val LogList: MutableList<String> = Collections.synchronizedList(ArrayList())
+        val LogDir: String = Configurations().get("log-dir").toString()
+    }
+}
+class LogWriter : Runnable{
     override fun run() {
         val logPath = Paths.get(LogDir).toAbsolutePath()
 
@@ -96,21 +105,14 @@ class Logger(private val prefix: String? = "") : Runnable, SimpleLogger {
             println("Failed to write logs: ${e.message}")
         }
     }
+    private fun getCurrentLogFile(logPath: java.nio.file.Path): File {
+        val logFiles = logPath.toFile().listFiles()?.sortedBy { it.name } ?: listOf()
+        return logFiles.lastOrNull() ?: createNewLogFile(logPath)
+    }
 
-    companion object {
-        const val MAX_LOG_SIZE_MB = 100
-        val LogList: MutableList<String> = Collections.synchronizedList(ArrayList())
-        val LogDir: String = Configurations().get("log-dir").toString()
-
-        private fun getCurrentLogFile(logPath: java.nio.file.Path): File {
-            val logFiles = logPath.toFile().listFiles()?.sortedBy { it.name } ?: listOf()
-            return logFiles.lastOrNull() ?: createNewLogFile(logPath)
-        }
-
-        private fun createNewLogFile(logPath: java.nio.file.Path): File {
-            val dateFormat = SimpleDateFormat("yyyyMMdd_HHmmss")
-            val logFileName = "log_" + dateFormat.format(Date()) + ".txt"
-            return logPath.resolve(logFileName).toFile()
-        }
+    private fun createNewLogFile(logPath: java.nio.file.Path): File {
+        val dateFormat = SimpleDateFormat("yyyyMMdd_HHmmss")
+        val logFileName = "log_" + dateFormat.format(Date()) + ".txt"
+        return logPath.resolve(logFileName).toFile()
     }
 }
