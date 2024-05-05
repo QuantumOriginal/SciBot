@@ -68,6 +68,7 @@ class PluginManager(private val pluginDirectory: String) {
     }
     fun invokePluginMethod(type: Annotype, event: Events.MajorEvent, args: MessageConstructor.Types) {
         logger.log("Loaded plugins: ${loadedPlugins.size}")
+        logger.debug("-------------------BEGIN INVOKE-------------------")
 
         loadedPlugins.forEach { plugin ->
             val plainHandlerMethods = plugin::class.declaredMemberFunctions
@@ -119,6 +120,7 @@ class PluginManager(private val pluginDirectory: String) {
                 }
             }
         }
+        logger.debug("--------------------END INVOKE--------------------")
     }
 
     enum class Annotype {

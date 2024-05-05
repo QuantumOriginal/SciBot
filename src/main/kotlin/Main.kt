@@ -1,10 +1,8 @@
 package ind.glowingstone
 
-import Events
 import LogWriter
 import Logger
 import PluginManager
-import Sender
 import org.http4k.client.JavaHttpClient
 import org.http4k.core.Filter
 import org.http4k.core.HttpHandler
@@ -24,9 +22,10 @@ val printResponseBodyFilter = Filter { next ->
 val client: HttpHandler = JavaHttpClient()
 suspend fun main(){
     val logger: Logger = Logger("MAIN")
+    logger.log("Sci-Bot loading...", Level.INFO)
     val executor = Executors.newSingleThreadScheduledExecutor()
     executor.scheduleAtFixedRate(LogWriter(), 0, 100, TimeUnit.MILLISECONDS)
-    val cfg: Configurations = Configurations();
+    val cfg = Configurations();
     val web = Handler()
     if (cfg.get("auth")?.equals("YOUR_KEY_HERE") == true){
         logger.log("Warning: Sci-Bot is starting without an auth key. Requests without an auth key may be vulnerable.", Level.WARNING)
@@ -37,6 +36,8 @@ suspend fun main(){
     val deliver = Deliver()
     pluginMgr.getDisabledPlugins()
     pluginMgr.loadPlugins()
+    val messageArr: MutableList<Any> = mutableListOf(Events.PlainMessage("Hello"))
+    deliver.callPlugins(MessageConstructor.Types.PLAIN,messageArr, false, User.Sender(123456,"abc"))
 }
 class Host{
     companion object{
