@@ -6,6 +6,7 @@ import org.http4k.core.Response
 import org.http4k.core.Status
 import org.json.JSONObject
 import kotlinx.coroutines.*
+import org.http4k.core.Request
 import java.util.logging.Level
 
 class Sender : SimpleSender {
@@ -26,7 +27,18 @@ class Sender : SimpleSender {
             }
         }
     }
-
+    suspend fun testEndpoint(): Boolean {
+        return withContext(Dispatchers.IO) {
+            try {
+                val uploadUrl = cfg.get("upload_url")?.toString() ?: return@withContext false
+                val request = Request(Method.GET, uploadUrl)
+                val result = QClient(request)
+                result.status == Status.OK
+            } catch (e: Exception) {
+                false
+            }
+        }
+    }
     override suspend fun send(
         msgArrs: MutableList<Any>,
         operation: Type,

@@ -34,7 +34,6 @@ class PluginManager(private val pluginDirectory: String) {
         logger.log("Started.")
     }
     fun getDisabledPlugins(){
-        val pluginDir = File(pluginDirectory)
         disabledJarFiles?.forEach { jarFile ->
             try {
                 val pluginName = loadPluginConfig("plugin-name", jarFile.toString()).toString()
