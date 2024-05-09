@@ -86,7 +86,7 @@ class PluginManager(private val pluginDirectory: String) {
 
         loadedPlugins.forEach { plugin ->
             val plainHandlerMethods = plugin::class.declaredMemberFunctions
-                .filter { it.findAnnotation<Annonations.PlainHandler>() != null }
+                .filter { it.findAnnotation<Annonations.GroupHandler>() != null }
 
             logger.debug("PlainHandler methods: ${plainHandlerMethods.size}")
 
@@ -105,7 +105,7 @@ class PluginManager(private val pluginDirectory: String) {
 
             when (type) {
                 Annotype.PLAIN -> {
-                    logger.debug("Invoking PlainHandler methods")
+                    logger.debug("Invoking GroupHandler methods")
 
                     plainHandlerMethods.forEach { method ->
                         method.isAccessible = true
