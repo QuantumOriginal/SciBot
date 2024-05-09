@@ -7,6 +7,7 @@ import java.net.URLClassLoader
 import java.util.Enumeration
 import java.util.jar.JarEntry
 import java.util.jar.JarFile
+import java.util.logging.Level
 import java.util.logging.Level.SEVERE
 import kotlin.reflect.full.createInstance
 import kotlin.reflect.full.declaredMemberFunctions
@@ -45,11 +46,10 @@ class PluginManager(private val pluginDirectory: String) {
             }
         }
     }
+
     suspend fun loadPlugins() {
-        if (pluginDir.listFiles()?.isEmpty() == true) {
-            return
-        }
         val jarFiles = pluginDir.listFiles { _, name -> name.endsWith(".jar") }
+
         jarFiles?.forEach { jarFile ->
             try {
                 val mainClassName = loadPluginConfig("main-class", jarFile.toString()).toString()
@@ -57,25 +57,24 @@ class PluginManager(private val pluginDirectory: String) {
                 if (Plugin::class.java.isAssignableFrom(pluginClass)) {
                     val pluginInstance = pluginClass.kotlin.createInstance() as Plugin
                     loadedPlugins.add(pluginInstance)
-                    val setLoggerMethod: Method? = pluginInstance.javaClass.methods.firstOrNull {
-                        it.name == "getLogger" && it.parameterCount == 1 && it.parameterTypes[0] == Logger::class.java
+
+                    val loggerName = loadPluginConfig("plugin-name", jarFile.toString()).toString()
+                    val pluginLogger = Logger(loggerName)
+                    val setLoggerMethod = pluginInstance.javaClass.methods.firstOrNull {
+                        it.name == "getLogger" && it.parameterCount == 1 && it.parameterTypes[0] == SimpleLogger::class.java
                     }
-                    val setSenderMethod: Method? = pluginInstance.javaClass.methods.firstOrNull {
-                        it.name == "getSender" && it.parameterCount == 1 && it.parameterTypes[0] == Logger::class.java
+                    setLoggerMethod?.invoke(pluginInstance, pluginLogger)
+                    val setSenderMethod = pluginInstance.javaClass.methods.firstOrNull {
+                        it.name == "getSender" &&it.parameterCount == 1 &&it.parameterTypes[0] == SimpleSender::class.java
                     }
-                    if (setLoggerMethod != null) {
-                        val loggerName = loadPluginConfig("plugin-name", jarFile.toString()).toString()
-                        val pluginLogger = Logger(loggerName)
-                        setLoggerMethod.invoke(pluginInstance, pluginLogger)
-                    }
-                    if (setSenderMethod != null) {
-                        val pluginSender = Sender()
-                        setSenderMethod.invoke(pluginInstance, pluginSender)
-                    }
+
+                    val pluginSender = Sender()
+                    setSenderMethod?.invoke(pluginInstance, pluginSender)
+
                     pluginInstance.start()
                 }
             } catch (e: Exception) {
-                logger.log("加载插件 ${jarFile.name} 时出现错误: ${e.message}")
+                logger.log("插件 ${jarFile.name} 的 start 方法出现错误: ${e.message}", Level.SEVERE)
                 e.printStackTrace()
             }
         }
