@@ -1,5 +1,6 @@
 package ind.glowingstone
 
+import Events
 import LogWriter
 import Logger
 import PluginManager
