@@ -1,4 +1,4 @@
-name: Java CI with Maven
+name: Java CI with Gradle
 
 on:
   push:
@@ -18,10 +18,10 @@ jobs:
       with:
         java-version: '21'
         distribution: 'temurin'
-        cache: maven
+        cache: gradle
 
-    - name: Build with Maven
-      run: mvn package
+    - name: Build with Gradle
+      run: gradle build
 
     - name: Generate Timestamped Filename
       id: timestamp
@@ -31,4 +31,4 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
         name: testbuild_${{ env.TIMESTAMP }}.jar
-        path: target/*.jar
+        path: build/lib/*.jar
