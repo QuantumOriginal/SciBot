@@ -21,7 +21,7 @@ jobs:
         cache: gradle
 
     - name: Build with Gradle
-      run: gradle build
+      run: gradle clean build
 
     - name: Generate Timestamped Filename
       id: timestamp
