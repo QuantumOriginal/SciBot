@@ -15,6 +15,7 @@ import java.util.*
 import java.util.Collections
 import java.util.logging.Level
 import java.util.logging.Level.INFO
+import org.scibot.Interfaces.*
 
 class Logger(private val prefix: String? = "") : SimpleLogger {
     val config = Host.configInstance

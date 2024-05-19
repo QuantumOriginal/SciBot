@@ -1,7 +1,9 @@
 package ind.glowingstone
+import org.scibot.Events.*
 import org.json.JSONArray
 import org.json.JSONObject
-import User
+import org.scibot.Events
+
 class Deliver{
     val loader = Loader()
     val utils = Utils()
@@ -23,7 +25,7 @@ class Deliver{
         val nickname: String = senderObj.getString("nickname")
         val msgTypeObjs: JSONArray = body.getJSONArray("message")
         val listsOfMsgSegs = utils.convertJsonArr(msgTypeObjs)
-        val msgArrs:MutableList<Any> = ArrayList()
+        val msgArrs:MutableList<org.scibot.Events> = ArrayList()
         for (msgTypeObj:JSONObject in listsOfMsgSegs) {
             val msgDetailObj: JSONObject = msgTypeObj.getJSONObject("data")
             when(msgTypeObj.getString("type")) {
@@ -53,16 +55,16 @@ class Deliver{
                 }
             }
         }
-        val sender = User.Sender(uid, nickname, role)
+        val sender = org.scibot.User.Sender(uid, nickname, role)
         callPlugins(utils.determineType(msgArrs), msgArrs, false, sender)
     }
-    fun callPlugins(type: MessageConstructor.Types, arg: MutableList<Any>, isPriv:Boolean, sender: User.Sender){
+    fun callPlugins(type: MessageConstructor.Types, arg: MutableList<Events>, isPriv:Boolean, sender: org.scibot.User.Sender){
         loader.call(type, arg , isPriv, sender)
     }
     fun priv(body: JSONObject) {
         val msgTypeObjs: JSONArray = body.getJSONArray("message")
         val listsOfMsgSegs = utils.convertJsonArr(msgTypeObjs)
-        val msgArrs:MutableList<Any> = ArrayList()
+        val msgArrs:MutableList<Events> = ArrayList()
         for (msgTypeObj:JSONObject in listsOfMsgSegs) {
             val msgDetailObj: JSONObject = msgTypeObj.getJSONObject("data")
             when(msgTypeObj.getString("type")) {
@@ -90,7 +92,7 @@ class Deliver{
         val senderObj = body.getJSONObject("sender")
         val uid: Long = senderObj.getLong("user_id")
         val nickname: String = senderObj.getString("nickname")
-        val sender: User.Sender = User.Sender(uid, nickname)
+        val sender = org.scibot.User.Sender(uid, nickname)
         callPlugins(utils.determineType(msgArrs), msgArrs, true, sender)
     }
 }

@@ -1,7 +1,7 @@
 package ind.glowingstone
 
 import Logger
-import SimpleLogger
+import org.scibot.Interfaces.*
 import org.yaml.snakeyaml.Yaml
 import java.io.File
 import java.io.FileWriter

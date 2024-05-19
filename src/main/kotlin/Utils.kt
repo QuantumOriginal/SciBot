@@ -1,5 +1,6 @@
 package ind.glowingstone
 
+import org.scibot.Events
 import org.json.JSONArray
 import org.json.JSONObject
 
@@ -19,7 +20,7 @@ class Utils {
         }
         return false
     }
-    fun determineType(list: MutableList<Any>): MessageConstructor.Types {
+    fun determineType(list: MutableList<Events>): MessageConstructor.Types {
         return when {
             list.any { it is Events.AtMessage } -> MessageConstructor.Types.AT
             list.any { it is Events.PicMessage } -> MessageConstructor.Types.IMG

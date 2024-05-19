@@ -1,5 +1,6 @@
 import Logger
 import ind.glowingstone.MessageConstructor
+import org.scibot.Interfaces
 import org.yaml.snakeyaml.Yaml
 import java.io.*
 import java.lang.reflect.Method
@@ -14,10 +15,8 @@ import kotlin.reflect.full.declaredMemberFunctions
 import kotlin.reflect.full.findAnnotation
 import kotlin.reflect.jvm.isAccessible
 import kotlin.reflect.jvm.javaMethod
-
-interface Plugin {
-    suspend fun start()
-}
+import org.scibot.Interfaces.*
+import org.scibot.Annonations.*
 
 class PluginManager(private val pluginDirectory: String) {
     val logger: Logger = Logger("PluginManager")
@@ -80,13 +79,13 @@ class PluginManager(private val pluginDirectory: String) {
         }
     }
 
-    fun invokePluginMethod(type: Annotype, event: Events.MajorEvent, args: MessageConstructor.Types) {
+    fun invokePluginMethod(type: Annotype, event: org.scibot.Events.MajorEvent, args: MessageConstructor.Types) {
         logger.log("Loaded plugins: ${loadedPlugins.size}")
         logger.debug("-------------------BEGIN INVOKE-------------------")
 
         loadedPlugins.forEach { plugin ->
             val plainHandlerMethods = plugin::class.declaredMemberFunctions
-                .filter { it.findAnnotation<Annonations.GroupHandler>() != null }
+                .filter { it.findAnnotation<GroupHandler>() != null }
 
             logger.debug("PlainHandler methods: ${plainHandlerMethods.size}")
 
@@ -95,7 +94,7 @@ class PluginManager(private val pluginDirectory: String) {
             }
 
             val privateHandlerMethods = plugin::class.declaredMemberFunctions
-                .filter { it.findAnnotation<Annonations.PrivateHandler>() != null}
+                .filter { it.findAnnotation<PrivateHandler>() != null}
 
             logger.debug("PrivateHandler methods: ${privateHandlerMethods.size}")
 

@@ -1,9 +1,9 @@
 package ind.glowingstone
 
-import PluginManager
+import org.scibot.Events
 
 class Loader {
-    fun call(type: MessageConstructor.Types, arg: MutableList<Any>, isPrivate: Boolean, sender: User.Sender) {
+    fun call(type: MessageConstructor.Types, arg: MutableList<org.scibot.Events>, isPrivate: Boolean, sender: org.scibot.User.Sender) {
         /*
         A Listener should handle:
         A arrayList contains a list of message events
