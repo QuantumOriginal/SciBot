@@ -1,7 +1,7 @@
 plugins {
     `java-library`
     `maven-publish`
-    kotlin("jvm") version "1.9.24"
+    kotlin("jvm") version "2.0.0"
     id("com.github.johnrengelman.shadow") version "7.1.2"
 }
 
@@ -13,8 +13,8 @@ repositories {
 dependencies {
     implementation(kotlin("stdlib"))
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
-    implementation("org.jetbrains.kotlin:kotlin-stdlib:1.9.24")
-    implementation("org.jetbrains.kotlin:kotlin-reflect:1.9.24")
+    implementation("org.jetbrains.kotlin:kotlin-stdlib:2.0.0")
+    implementation("org.jetbrains.kotlin:kotlin-reflect:2.0.0")
     implementation("org.json:json:20210307")
     implementation("org.yaml:snakeyaml:1.29")
     implementation("org.http4k:http4k-core:4.9.9.0")
