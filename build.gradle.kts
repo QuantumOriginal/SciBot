@@ -19,6 +19,7 @@ dependencies {
     implementation("org.yaml:snakeyaml:1.29")
     implementation("org.http4k:http4k-core:4.9.9.0")
     implementation(files("lib/dependencies-0.1.jar"))
+    implementation("org.http4k:http4k-client-okhttp:4.15.0.0")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit5:1.9.24")
     testImplementation("org.junit.jupiter:junit-jupiter-engine:5.8.2")
 }

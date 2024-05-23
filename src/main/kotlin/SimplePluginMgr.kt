@@ -3,7 +3,6 @@ import ind.glowingstone.MessageConstructor
 import org.scibot.Interfaces
 import org.yaml.snakeyaml.Yaml
 import java.io.*
-import java.lang.reflect.Method
 import java.net.URLClassLoader
 import java.util.Enumeration
 import java.util.jar.JarEntry
@@ -19,6 +18,13 @@ import org.scibot.Interfaces.*
 import org.scibot.Annonations.*
 
 class PluginManager(private val pluginDirectory: String) {
+    class PluginManifests{
+        var name:String = ""
+        var version: String = ""
+        var author: String? = ""
+        var description: String? = ""
+        var repository: String? = ""
+    }
     val logger: Logger = Logger("PluginManager")
     companion object{
         val loadedPlugins = mutableListOf<Plugin>()
@@ -45,7 +51,25 @@ class PluginManager(private val pluginDirectory: String) {
             }
         }
     }
+    fun getPluginList() {
+        val jarFiles = pluginDir.listFiles { _, name -> name.endsWith(".jar") }
+        val pluginsInMarket : MutableList<PluginManifests> = mutableListOf()
+        jarFiles?.forEach { jarFile ->
+        try {
+                val pluginManifest = PluginManifests()
+                val configmap = loadPluginConfipMapper(jarFile.toString())
+                if (configmap.contains("version") && configmap.contains("plugin-name")){
+                    pluginManifest.name = configmap["plugin-name"].toString()
+                    pluginManifest.version = configmap["version"].toString()
+                } else {
+                    logger.log("plugin ${jarFile.toString()} doesn't contains a correct plugin manifest.")
+                }
+                pluginsInMarket.add(pluginManifest)
+            } catch (e: Exception){
 
+            }
+        }
+    }
     suspend fun loadPlugins() {
         val jarFiles = pluginDir.listFiles { _, name -> name.endsWith(".jar") }
 
@@ -160,5 +184,24 @@ class PluginManager(private val pluginDirectory: String) {
         val yamlParser = Yaml()
         val configMap: Map<String, Any> = yamlParser.load(configYmlRaw)
         return configMap[key]
+    }
+    fun loadPluginConfipMapper(jarPath: String): Map<String,Any> {
+        val jarFile = JarFile(jarPath)
+        var configYmlRaw: String? = null
+        val entries: Enumeration<JarEntry> = jarFile.entries()
+        while (entries.hasMoreElements()) {
+            val entry = entries.nextElement()
+            if (entry.name == "plugin.yml") {
+                val inputStream = jarFile.getInputStream(entry)
+                configYmlRaw = BufferedReader(InputStreamReader(inputStream)).use { it.readText() }
+                break
+            }
+        }
+        if (configYmlRaw == null) {
+            throw IllegalArgumentException("Resource 'plugin.yml' not found in JAR: $jarPath")
+        }
+        val yamlParser = Yaml()
+        val configMap: Map<String, Any> = yamlParser.load(configYmlRaw)
+        return configMap
     }
 }

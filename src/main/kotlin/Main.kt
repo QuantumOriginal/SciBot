@@ -1,6 +1,5 @@
 package ind.glowingstone
 
-import Events
 import LogWriter
 import Logger
 import PluginManager
@@ -25,6 +24,7 @@ val printResponseBodyFilter = Filter { next ->
 val client: HttpHandler = JavaHttpClient()
 suspend fun main(){
     val logger: Logger = Logger("MAIN")
+    val market = pluginMarket.market()
     val timecost = measureTimeMillis {
         logger.log("Sci-Bot loading...", Level.INFO)
         val sender: Sender = Sender()
@@ -44,12 +44,16 @@ suspend fun main(){
                 Level.WARNING
             )
         }
+        if (cfg.get("enablePluginMarket")?.equals("true") == true) {
+            market.init()
+        }
         val pluginMgr = PluginManager("plugins")
         Host.pluginMgr = pluginMgr
         web.init()
         val deliver = Deliver()
         pluginMgr.getDisabledPlugins()
         pluginMgr.loadPlugins()
+        market.init()
     }
     logger.log("INIT Success. cost $timecost ms")
 }

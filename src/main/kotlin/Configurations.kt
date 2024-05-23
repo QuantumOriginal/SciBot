@@ -18,7 +18,8 @@ class Configurations {
         "upload_url" to "localhost:8080",
         "log-dir" to "./logs",
         "debug" to false,
-        "auth" to "YOUR_KEY_HERE"
+        "auth" to "YOUR_KEY_HERE",
+        "enablePluginMarket" to "true"
     )
 
     init {
