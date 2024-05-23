@@ -35,7 +35,7 @@ class Deliver{
                 }
                 "at" -> {
                     //well, we don't call a separate event for AT. So you should manually get this func by Util.hasAt().
-                    val event: Events.AtMessage = Events.AtMessage(msgDetailObj.getLong("qq"))
+                    val event: AtMessage =  AtMessage(msgDetailObj.getLong("qq"))
                     msgArrs.add(event)
                 }
                 "image" -> {
@@ -69,22 +69,22 @@ class Deliver{
             val msgDetailObj: JSONObject = msgTypeObj.getJSONObject("data")
             when(msgTypeObj.getString("type")) {
                 "text" -> {
-                    val event: Events.PlainMessage = Events.PlainMessage(msgDetailObj.getString("text"))
+                    val event: PlainMessage = PlainMessage(msgDetailObj.getString("text"))
                     msgArrs.add(event)
                 }
                 "image" -> {
-                    var event: Events.PicMessage? = null
+                    var event: PicMessage? = null
                     if (msgDetailObj.getBoolean("isFlash")) {
-                        event= Events.PicMessage(msgDetailObj.getString("url"), true)
+                        event= PicMessage(msgDetailObj.getString("url"), true)
                     } else {
-                        event= Events.PicMessage(msgDetailObj.getString("url"), false)
+                        event= PicMessage(msgDetailObj.getString("url"), false)
                     }
                     if (event != null) {
                         msgArrs.add(event)
                     }
                 }
                 "video" -> {
-                    val event: Events.VideoMessage = Events.VideoMessage(msgDetailObj.getString("file"))
+                    val event: VideoMessage = VideoMessage(msgDetailObj.getString("file"))
                     msgArrs.add(event)
                 }
             }

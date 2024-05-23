@@ -7,11 +7,11 @@ import org.http4k.core.Status
 import org.json.JSONObject
 import kotlinx.coroutines.*
 import org.http4k.core.Request
-import org.scibot.Interfaces
+import org.scibot.Interfaces.SimpleSender
 import org.scibot.Sender
 import java.util.logging.Level
 
-class Sender : Interfaces.SimpleSender {
+class Sender : SimpleSender {
     private val logger = Logger("Sender")
     private val messageConstructor = MessageConstructor()
     private val cfg = Configurations()
@@ -41,12 +41,6 @@ class Sender : Interfaces.SimpleSender {
             }
         }
     }
-
-    enum class Type {
-        PRIVATE,
-        GROUP
-    }
-
     override suspend fun plainSend(content: String, operation: Sender.Type, id: Long) {
         val msgObj = JSONObject()
         val accessToken = if (cfg.get("auth")?.equals("YOUR_KEY_HERE") == true) {
@@ -98,7 +92,7 @@ class Sender : Interfaces.SimpleSender {
             msgObj.put("group_id", id)
         }
 
-        val request = org.http4k.core.Request(Method.POST, urlEndpoint).body(msgObj.toString())
+        val request = Request(Method.POST, urlEndpoint).body(msgObj.toString())
         val response = sendAsync(request)
         if (response.status != Status.OK) {
             logger.log("ERROR POST message to Server. Status: ${response.status}, Description: ${response.status.description}", Level.SEVERE)
