@@ -75,7 +75,8 @@ class Sender : SimpleSender {
 
     override suspend fun send(msgArrs: MutableList<org.scibot.Events>, operation: Sender.Type, id: Long) {
         val msgObj = JSONObject()
-        val accessToken = if (cfg.get("auth")?.equals("YOUR_KEY_HERE") == true) {
+
+        val accessToken = if (cfg.get("auth")!! == "YOUR_KEY_HERE") {
             ""
         } else {
             "?access_token=${cfg.get("auth")}"

@@ -57,7 +57,7 @@ class Configurations {
             configMap["configuration_version"] = defaultVersion
             isUpdated = true
         }
-        for ((key, value) in defaultConfigMap) {
+        defaultConfigMap.forEach{ (key, value) ->
             if (!configMap.containsKey(key)) {
                 configMap[key] = value
                 isUpdated = true
@@ -75,6 +75,9 @@ class Configurations {
     }
 
     fun get(key: String): Any? {
+        assert(configMap.containsKey(key) && configMap.containsValue(configMap[key])) {
+            logger.log("Cannot get specified key from map.")
+        }
         return configMap[key]
     }
 }
