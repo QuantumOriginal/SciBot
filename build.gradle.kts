@@ -1,13 +1,12 @@
 plugins {
-    `java-library`
-    `maven-publish`
-    kotlin("jvm") version "2.0.0"
+    kotlin("jvm") version "1.9.24"
     id("com.github.johnrengelman.shadow") version "7.1.2"
 }
 
 repositories {
-    mavenLocal()
+    gradlePluginPortal()
     mavenCentral()
+    mavenLocal()
 }
 
 dependencies {
@@ -15,8 +14,8 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
     implementation("org.jetbrains.kotlin:kotlin-stdlib:2.0.0")
     implementation("org.jetbrains.kotlin:kotlin-reflect:2.0.0")
-    implementation("org.json:json:20210307")
-    implementation("org.yaml:snakeyaml:1.29")
+    implementation("org.json:json:20231013")
+    implementation("org.yaml:snakeyaml:2.0")
     implementation("org.http4k:http4k-core:4.9.9.0")
     implementation(files("lib/dependencies-0.1.jar"))
     implementation("org.http4k:http4k-client-okhttp:4.15.0.0")
@@ -29,12 +28,6 @@ version = "1.0-SNAPSHOT"
 description = "SciBot"
 java.sourceCompatibility = JavaVersion.VERSION_21
 
-publishing {
-    publications.create<MavenPublication>("maven") {
-        from(components["java"])
-    }
-}
-
 tasks.withType<JavaCompile> {
     options.encoding = "UTF-8"
 }
@@ -45,7 +38,7 @@ tasks.withType<Javadoc> {
 
 tasks.jar {
     manifest {
-        attributes["Main-Class"] = "ind.glowingstone.MainKt"  // 替换为你的主类路径
+        attributes["Main-Class"] = "ind.glowingstone.MainKt"
     }
 }
 tasks.build {

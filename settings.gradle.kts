@@ -7,5 +7,5 @@
 pluginManagement {
     // Include 'plugins build' to define convention plugins.
 }
-
 rootProject.name = "SciBot"
+include("SciBot", "SciBot-dependencies")

@@ -1,6 +1,6 @@
 package ind.glowingstone
 
-import Events
+import org.scibot.Events
 import org.json.JSONArray
 import org.json.JSONObject
 

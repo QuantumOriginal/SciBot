@@ -7,6 +7,7 @@ import org.http4k.core.Status
 import org.json.JSONObject
 import kotlinx.coroutines.*
 import org.http4k.core.Request
+import org.scibot.Events
 import org.scibot.Interfaces.SimpleSender
 import org.scibot.Sender
 import java.util.logging.Level
