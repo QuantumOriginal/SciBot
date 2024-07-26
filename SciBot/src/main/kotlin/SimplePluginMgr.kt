@@ -1,5 +1,6 @@
 import Logger
 import ind.glowingstone.MessageConstructor
+import kotlinx.coroutines.*
 import org.scibot.Interfaces
 import org.yaml.snakeyaml.Yaml
 import java.io.*
@@ -9,13 +10,11 @@ import java.util.jar.JarEntry
 import java.util.jar.JarFile
 import java.util.logging.Level
 import java.util.logging.Level.SEVERE
-import kotlin.reflect.full.createInstance
-import kotlin.reflect.full.declaredMemberFunctions
-import kotlin.reflect.full.findAnnotation
 import kotlin.reflect.jvm.isAccessible
 import kotlin.reflect.jvm.javaMethod
 import org.scibot.Interfaces.*
 import org.scibot.Annonations.*
+import kotlin.reflect.full.*
 
 class PluginManager(private val pluginDirectory: String) {
     class PluginManifests{
@@ -72,7 +71,6 @@ class PluginManager(private val pluginDirectory: String) {
     }
     suspend fun loadPlugins() {
         val jarFiles = pluginDir.listFiles { _, name -> name.endsWith(".jar") }
-
         jarFiles?.forEach { jarFile ->
             try {
                 val mainClassName = loadPluginConfig("main-class", jarFile.toString()).toString()
@@ -95,6 +93,25 @@ class PluginManager(private val pluginDirectory: String) {
                     setSenderMethod?.invoke(pluginInstance, pluginSender)
 
                     pluginInstance.start()
+                }
+
+                JarFile(jarFile).use { jar ->
+                    val entries = jar.entries()
+                    while (entries.hasMoreElements()) {
+                        val entry = entries.nextElement()
+                        if (entry.name.endsWith(".class")) {
+                            val className = entry.name.replace("/", ".").removeSuffix(".class")
+                            val clazz = classLoader.loadClass(className).kotlin
+                            val instance = try {
+                                clazz.createInstance()
+                            } catch (e: Exception) {
+                                null
+                            }
+                            instance?.let {
+                                TaskScheduler.scheduleTasks(it)
+                            }
+                        }
+                    }
                 }
             } catch (e: Exception) {
                 logger.log("插件 ${jarFile.name} 的 start 方法出现错误: ${e.message}", Level.SEVERE)
@@ -203,5 +220,29 @@ class PluginManager(private val pluginDirectory: String) {
         val yamlParser = Yaml()
         val configMap: Map<String, Any> = yamlParser.load(configYmlRaw)
         return configMap
+    }
+    object TaskScheduler {
+        private val jobs = mutableListOf<Job>()
+
+        suspend fun scheduleTasks(pluginInstance: Any) {
+            val kClass = pluginInstance::class
+
+            for (function in kClass.functions) {
+                val scheduler = function.findAnnotation<Scheduler>()
+                if (scheduler != null) {
+                    val job = CoroutineScope(Dispatchers.IO).launch {
+                        while (isActive) {
+                            function.call(pluginInstance)
+                            delay(scheduler.interval)
+                        }
+                    }
+                    jobs.add(job)
+                }
+            }
+        }
+        fun cancelAllTasks() {
+            jobs.forEach { it.cancel() }
+            jobs.clear()
+        }
     }
 }
