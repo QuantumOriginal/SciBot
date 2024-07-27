@@ -10,7 +10,7 @@ class SimpleScheduler : Interfaces.Scheduler {
         operation: Interfaces.Scheduler.() -> Unit,
         interval: Long,
         unit: TimeUnit,
-        dispatcher: MainCoroutineDispatcher?
+        dispatcher: CoroutineDispatcher?
     ) {
         val job = CoroutineScope(dispatcher?.plus(SupervisorJob()) ?: (Dispatchers.Main + SupervisorJob())).launch {
             while (isActive) {

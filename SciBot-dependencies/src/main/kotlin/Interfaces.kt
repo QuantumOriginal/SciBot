@@ -1,5 +1,6 @@
 package org.scibot
 
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainCoroutineDispatcher
 import org.scibot.Events
@@ -19,7 +20,7 @@ class Interfaces {
         suspend fun send(msgArrs: MutableList<Events>, operation: Sender.Type, id: Long)
     }
     interface Scheduler{
-        suspend fun schedule(operation: Scheduler.() -> Unit, interval: Long, unit: TimeUnit, dispatcher: MainCoroutineDispatcher? = Dispatchers.Main)
+        suspend fun schedule(operation: Scheduler.() -> Unit, interval: Long, unit: TimeUnit, dispatcher: CoroutineDispatcher? = Dispatchers.Main)
         fun close()
     }
 }
