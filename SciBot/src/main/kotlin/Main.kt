@@ -24,18 +24,17 @@ val printResponseBodyFilter = Filter { next ->
 val client: HttpHandler = JavaHttpClient()
 suspend fun main(){
     val logger: Logger = Logger("MAIN")
-    val market = pluginMarket.market()
     val timecost = measureTimeMillis {
+        val cfg = Configurations()
         logger.log("Sci-Bot loading...", Level.INFO)
         val sender: Sender = Sender()
+        logger.debug("sending request -> ${cfg.get("upload_url")?.toString() }")
         if (!sender.testEndpoint()) {
             logger.log("Warning: Specified URL Endpoint isn't accessible. Wait 1000ms to continue...", Level.WARNING)
             Thread.sleep(1000)
         }
         val executor = Executors.newSingleThreadScheduledExecutor()
         executor.scheduleAtFixedRate(LogWriter(), 0, 100, TimeUnit.MILLISECONDS)
-
-        val cfg = Configurations();
         val web = Handler()
 
         if (cfg.get("auth")?.equals("YOUR_KEY_HERE") == true) {
@@ -45,7 +44,7 @@ suspend fun main(){
             )
         }
         if (cfg.get("enablePluginMarket")?.equals("true") == true) {
-            market.init()
+            //market.init()
         }
         val pluginMgr = PluginManager("plugins")
         Host.pluginMgr = pluginMgr
@@ -53,7 +52,6 @@ suspend fun main(){
         val deliver = Deliver()
         pluginMgr.getDisabledPlugins()
         pluginMgr.loadPlugins()
-        market.init()
     }
     logger.log("INIT Success. cost $timecost ms")
 }

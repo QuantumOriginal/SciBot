@@ -1,6 +1,8 @@
 import Logger
+import SimpleScheduler.Companion.jobList
 import ind.glowingstone.MessageConstructor
 import kotlinx.coroutines.*
+import org.scibot.Annonations
 import org.scibot.Interfaces
 import org.yaml.snakeyaml.Yaml
 import java.io.*
@@ -222,27 +224,21 @@ class PluginManager(private val pluginDirectory: String) {
         return configMap
     }
     object TaskScheduler {
-        private val jobs = mutableListOf<Job>()
-
         suspend fun scheduleTasks(pluginInstance: Any) {
             val kClass = pluginInstance::class
 
             for (function in kClass.functions) {
-                val scheduler = function.findAnnotation<Scheduler>()
+                val scheduler = function.findAnnotation<Annonations.Scheduler>()
                 if (scheduler != null) {
-                    val job = CoroutineScope(Dispatchers.IO).launch {
+                    val job = CoroutineScope(Dispatchers.IO + SupervisorJob()).launch {
                         while (isActive) {
                             function.call(pluginInstance)
                             delay(scheduler.interval)
                         }
                     }
-                    jobs.add(job)
+                    jobList.add(job)
                 }
             }
-        }
-        fun cancelAllTasks() {
-            jobs.forEach { it.cancel() }
-            jobs.clear()
         }
     }
 }

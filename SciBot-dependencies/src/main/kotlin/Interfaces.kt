@@ -1,6 +1,9 @@
 package org.scibot
 
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.MainCoroutineDispatcher
 import org.scibot.Events
+import java.util.concurrent.TimeUnit
 import java.util.logging.Level
 
 class Interfaces {
@@ -14,6 +17,10 @@ class Interfaces {
     interface SimpleSender{
         suspend fun plainSend(content: String, operation: Sender.Type, id: Long)
         suspend fun send(msgArrs: MutableList<Events>, operation: Sender.Type, id: Long)
+    }
+    interface Scheduler{
+        suspend fun schedule(operation: Scheduler.() -> Unit, interval: Long, unit: TimeUnit, dispatcher: MainCoroutineDispatcher? = Dispatchers.Main)
+        fun close()
     }
 }
 

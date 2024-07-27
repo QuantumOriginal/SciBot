@@ -18,7 +18,7 @@ class Configurations {
         "log-dir" to "./logs",
         "debug" to false,
         "auth" to "YOUR_KEY_HERE",
-        "enablePluginMarket" to "true"
+        "enablePluginMarket" to "false"
     )
 
     init {
