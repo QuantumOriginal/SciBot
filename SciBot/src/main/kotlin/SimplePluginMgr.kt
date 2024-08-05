@@ -2,8 +2,8 @@ import Logger
 import SimpleScheduler.Companion.jobList
 import ind.glowingstone.MessageConstructor
 import kotlinx.coroutines.*
+import okhttp3.internal.platform.Platform.Companion.WARN
 import org.scibot.Annonations
-import org.scibot.Interfaces
 import org.yaml.snakeyaml.Yaml
 import java.io.*
 import java.net.URLClassLoader
@@ -19,6 +19,7 @@ import org.scibot.Annonations.*
 import kotlin.reflect.full.*
 
 class PluginManager(private val pluginDirectory: String) {
+
     class PluginManifests{
         var name:String = ""
         var version: String = ""
@@ -197,8 +198,8 @@ class PluginManager(private val pluginDirectory: String) {
             }
         }
 
-        if (configYmlRaw == null) {
-            throw IllegalArgumentException("Resource 'plugin.yml' not found in JAR: $jarPath")
+       requireNotNull(configYmlRaw) {
+            "Resource 'plugin.yml' not found in JAR: $jarPath"
         }
         val yamlParser = Yaml()
         val configMap: Map<String, Any> = yamlParser.load(configYmlRaw)
@@ -216,8 +217,8 @@ class PluginManager(private val pluginDirectory: String) {
                 break
             }
         }
-        if (configYmlRaw == null) {
-            throw IllegalArgumentException("Resource 'plugin.yml' not found in JAR: $jarPath")
+        requireNotNull(configYmlRaw) {
+            "Resource 'plugin.yml' not found in JAR: $jarPath"
         }
         val yamlParser = Yaml()
         val configMap: Map<String, Any> = yamlParser.load(configYmlRaw)

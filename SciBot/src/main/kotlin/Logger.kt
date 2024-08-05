@@ -63,10 +63,6 @@ class Logger(private val prefix: String? = "") : SimpleLogger {
         }
     }
 
-    fun getInstance(): Logger {
-        return this
-    }
-
     companion object {
         const val MAX_LOG_SIZE_MB = 100
         val LogList: MutableList<String> = Collections.synchronizedList(ArrayList())
