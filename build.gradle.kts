@@ -26,10 +26,9 @@ dependencies {
 group = "ind.glowingstone"
 version = "1.0-SNAPSHOT"
 description = "SciBot"
-java.sourceCompatibility = JavaVersion.VERSION_21
-
 tasks.withType<JavaCompile> {
     options.encoding = "UTF-8"
+    sourceCompatibility = "21"
 }
 
 tasks.withType<Javadoc> {

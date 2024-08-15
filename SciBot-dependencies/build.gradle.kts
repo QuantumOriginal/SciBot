@@ -11,3 +11,4 @@ repositories {
     mavenCentral()
     mavenLocal()
 }
+java.sourceCompatibility = JavaVersion.VERSION_21
