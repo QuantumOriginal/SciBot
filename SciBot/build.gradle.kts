@@ -8,7 +8,7 @@ dependencies {
     implementation("org.json:json:20231013")
 }
 plugins {
-    kotlin("jvm") version "1.9.24"
+    kotlin("jvm") version "2.0.0"
     id("com.github.johnrengelman.shadow") version "7.1.2"
 }
 repositories {

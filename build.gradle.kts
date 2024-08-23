@@ -1,5 +1,5 @@
 plugins {
-    kotlin("jvm") version "1.9.24"
+    kotlin("jvm") version "2.0.0"
     id("com.github.johnrengelman.shadow") version "7.1.2"
 }
 
@@ -28,7 +28,6 @@ version = "1.0-SNAPSHOT"
 description = "SciBot"
 tasks.withType<JavaCompile> {
     options.encoding = "UTF-8"
-    sourceCompatibility = "21"
 }
 
 tasks.withType<Javadoc> {

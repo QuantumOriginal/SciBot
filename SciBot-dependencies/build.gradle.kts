@@ -4,11 +4,10 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.9.0-RC")
 }
 plugins {
-    kotlin("jvm") version "1.9.24"
+    kotlin("jvm") version "2.0.0"
 }
 repositories {
     gradlePluginPortal()
     mavenCentral()
     mavenLocal()
 }
-java.sourceCompatibility = JavaVersion.VERSION_21

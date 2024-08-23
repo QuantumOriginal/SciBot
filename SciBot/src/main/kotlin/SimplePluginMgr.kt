@@ -16,6 +16,7 @@ import kotlin.reflect.jvm.isAccessible
 import kotlin.reflect.jvm.javaMethod
 import org.scibot.Interfaces.*
 import org.scibot.Annonations.*
+import kotlin.math.log
 import kotlin.reflect.full.*
 
 class PluginManager(private val pluginDirectory: String) {
@@ -116,6 +117,8 @@ class PluginManager(private val pluginDirectory: String) {
                         }
                     }
                 }
+            } catch(e: IncompatibleClassChangeError) {
+                logger.log("插件 ${jarFile.name} 不兼容当前的SciBot框架，请检查java环境。", Level.SEVERE)
             } catch (e: Exception) {
                 logger.log("插件 ${jarFile.name} 的 start 方法出现错误: ${e.message}", Level.SEVERE)
                 e.printStackTrace()
