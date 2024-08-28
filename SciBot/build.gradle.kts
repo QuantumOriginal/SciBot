@@ -18,9 +18,17 @@ repositories {
 }
 tasks.jar {
     manifest {
-        attributes["Main-Class"] = "ind.glowingstone.MainKt"
+        attributes["Main-Class"] = "ind.glowingstone.Main"
     }
+    from(sourceSets.main.get().output)
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 }
+
 tasks.build {
     dependsOn("shadowJar")
+}
+tasks.shadowJar {
+    manifest {
+        attributes["Main-Class"] = "ind.glowingstone.MainKt"
+    }
 }

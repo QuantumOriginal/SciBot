@@ -22,15 +22,18 @@ val printResponseBodyFilter = Filter { next ->
     }
 }
 val client: HttpHandler = JavaHttpClient()
-suspend fun main(){
+suspend fun main() {
     val logger: Logger = Logger("MAIN")
     val timecost = measureTimeMillis {
         val cfg = Configurations()
         logger.log("Sci-Bot loading...", Level.INFO)
         val sender: Sender = Sender()
-        logger.debug("sending request -> ${cfg.get("upload_url")?.toString() }")
+        logger.debug("sending request -> ${cfg.get("upload_url")?.toString()}")
         if (!sender.testEndpoint()) {
-            logger.log("Warning: Specified URL Endpoint isn't accessible. Wait 1000ms to continue...", Level.WARNING)
+            logger.log(
+                "Warning: Specified URL Endpoint isn't accessible. Wait 1000ms to continue...",
+                Level.WARNING
+            )
             Thread.sleep(1000)
         }
         val executor = Executors.newSingleThreadScheduledExecutor()
@@ -55,8 +58,9 @@ suspend fun main(){
     }
     logger.log("INIT Success. cost $timecost ms")
 }
-class Host{
-    companion object{
+
+class Host {
+    companion object {
         var pluginMgr: PluginManager? = null
         val HOST_VERSION = 0.1
         val QClient = printResponseBodyFilter.then(client)
