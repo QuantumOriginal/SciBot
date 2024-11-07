@@ -1,8 +1,7 @@
-import Logger
 import SimpleScheduler.Companion.jobList
+import ind.glowingstone.Host
 import ind.glowingstone.MessageConstructor
 import kotlinx.coroutines.*
-import okhttp3.internal.platform.Platform.Companion.WARN
 import org.scibot.Annonations
 import org.yaml.snakeyaml.Yaml
 import java.io.*
@@ -16,7 +15,7 @@ import kotlin.reflect.jvm.isAccessible
 import kotlin.reflect.jvm.javaMethod
 import org.scibot.Interfaces.*
 import org.scibot.Annonations.*
-import kotlin.math.log
+import org.scibot.HostOperations
 import kotlin.reflect.full.*
 
 class PluginManager(private val pluginDirectory: String) {
@@ -90,12 +89,15 @@ class PluginManager(private val pluginDirectory: String) {
                     }
                     setLoggerMethod?.invoke(pluginInstance, pluginLogger)
                     val setSenderMethod = pluginInstance.javaClass.methods.firstOrNull {
-                        it.name == "getSender" &&it.parameterCount == 1 &&it.parameterTypes[0] == SimpleSender::class.java
+                        it.name == "getSender" &&it.parameterCount == 1 && it.parameterTypes[0] == SimpleSender::class.java
                     }
-
                     val pluginSender = Sender()
                     setSenderMethod?.invoke(pluginInstance, pluginSender)
 
+                    val getHostMethod = pluginClass.javaClass.methods.firstOrNull {
+                        it.name == "getHost" &&it.parameterCount == 1&& it.parameterTypes[0] == HostOperations::class.java
+                    }
+                    getHostMethod?.invoke(pluginInstance, Host())
                     pluginInstance.start()
                 }
 

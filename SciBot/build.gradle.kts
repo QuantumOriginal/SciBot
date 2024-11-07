@@ -4,8 +4,9 @@ dependencies {
     implementation(kotlin("reflect"))
     implementation("org.yaml:snakeyaml:2.0")
     implementation("org.http4k:http4k-client-okhttp:4.15.0.0")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.9.0-RC")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.9.0")
     implementation("org.json:json:20231013")
+    implementation("com.google.code.gson:gson:2.11.0")
 }
 plugins {
     kotlin("jvm") version "2.0.0"

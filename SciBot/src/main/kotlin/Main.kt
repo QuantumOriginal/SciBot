@@ -4,11 +4,16 @@ import LogWriter
 import Logger
 import PluginManager
 import Sender
+import com.google.gson.Gson
 import org.http4k.client.JavaHttpClient
 import org.http4k.core.Filter
 import org.http4k.core.HttpHandler
+import org.http4k.core.Method
 import org.http4k.core.Request
 import org.http4k.core.then
+import org.scibot.HostOperations
+import org.scibot.LoginInfo
+import org.scibot.StrangerInfo
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 import java.util.logging.Level
@@ -59,11 +64,28 @@ suspend fun main() {
     logger.log("INIT Success. cost $timecost ms")
 }
 
-class Host {
+class Host: HostOperations {
+    override fun getCurrentLogin(): LoginInfo {
+        val request = Request(Method.GET, "${configInstance.get("upload_url")}/get_login_info$accessToken")
+        val response = QClient(request).bodyString()
+        return Gson().fromJson(response, LoginInfo::class.java)
+    }
+
+    override fun getStrangerInfo(userId: Long, cache: Boolean): StrangerInfo {
+        val request = Request(Method.GET, "${configInstance.get("upload_url")}/get_stranger_info$accessToken&user_id=$userId&no_cache=${!cache}")
+        val response = QClient(request).bodyString()
+        return Gson().fromJson(response, StrangerInfo::class.java)
+    }
+
     companion object {
         var pluginMgr: PluginManager? = null
         val HOST_VERSION = 0.1
         val QClient = printResponseBodyFilter.then(client)
         val configInstance = Configurations()
+        val accessToken = if (configInstance.get("auth")?.equals("YOUR_KEY_HERE") == true) {
+            ""
+        } else {
+            "?access_token=${configInstance.get("auth")}"
+        }
     }
 }

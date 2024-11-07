@@ -26,7 +26,7 @@ class MessageConstructor {
         }
 
         val msgArr = JSONArray()
-        for (msg in msgs) {
+        msgs.forEach{ msg ->
             val msgObj = createMsgObj(msg)
             val dataObj = getConsts(msg)
             msgObj.put("data", dataObj)

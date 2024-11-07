@@ -21,6 +21,7 @@ dependencies {
     implementation("org.http4k:http4k-client-okhttp:4.15.0.0")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit5:1.9.24")
     testImplementation("org.junit.jupiter:junit-jupiter-engine:5.8.2")
+    implementation("com.google.code.gson:gson:2.11.0")
 }
 
 group = "ind.glowingstone"

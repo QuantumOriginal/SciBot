@@ -30,4 +30,11 @@ class Utils {
             else -> MessageConstructor.Types.PLAIN
         }
     }
+    fun String.determineGender(): Gender {
+        return when {
+            this.contains("male") -> Gender.MALE
+            this.contains("female") -> Gender.FEMALE
+            else -> Gender.UNKNOWN
+        }
+    }
 }
