@@ -1,5 +1,6 @@
 import SimpleScheduler.Companion.jobList
 import ind.glowingstone.Host
+import ind.glowingstone.HostExposedToPlugins
 import ind.glowingstone.MessageConstructor
 import kotlinx.coroutines.*
 import org.scibot.Annonations
@@ -84,9 +85,12 @@ class PluginManager(private val pluginDirectory: String) {
 
                     val loggerName = loadPluginConfig("plugin-name", jarFile.toString()).toString()
                     val pluginLogger = Logger(loggerName)
+                    val pluginHost: HostOperations = HostExposedToPlugins()
+
                     val setLoggerMethod = pluginInstance.javaClass.methods.firstOrNull {
                         it.name == "getLogger" && it.parameterCount == 1 && it.parameterTypes[0] == SimpleLogger::class.java
                     }
+                    logger.debug("Logger Method: ${setLoggerMethod?.name}")
                     setLoggerMethod?.invoke(pluginInstance, pluginLogger)
                     val setSenderMethod = pluginInstance.javaClass.methods.firstOrNull {
                         it.name == "getSender" &&it.parameterCount == 1 && it.parameterTypes[0] == SimpleSender::class.java
@@ -95,9 +99,11 @@ class PluginManager(private val pluginDirectory: String) {
                     setSenderMethod?.invoke(pluginInstance, pluginSender)
 
                     val getHostMethod = pluginClass.javaClass.methods.firstOrNull {
-                        it.name == "getHost" &&it.parameterCount == 1&& it.parameterTypes[0] == HostOperations::class.java
+                        it.name == "getHost" && it.parameterCount == 1 && it.parameterTypes[0] == HostOperations::class.java
                     }
-                    getHostMethod?.invoke(pluginInstance, Host())
+                    println("Found getHost method: ${getHostMethod != null}")
+                    getHostMethod?.invoke(pluginInstance, pluginHost)
+
                     pluginInstance.start()
                 }
 

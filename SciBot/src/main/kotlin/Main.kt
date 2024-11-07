@@ -5,6 +5,9 @@ import Logger
 import PluginManager
 import Sender
 import com.google.gson.Gson
+import ind.glowingstone.Host.Companion.QClient
+import ind.glowingstone.Host.Companion.accessToken
+import ind.glowingstone.Host.Companion.configInstance
 import org.http4k.client.JavaHttpClient
 import org.http4k.core.Filter
 import org.http4k.core.HttpHandler
@@ -64,7 +67,7 @@ suspend fun main() {
     logger.log("INIT Success. cost $timecost ms")
 }
 
-class Host: HostOperations {
+class HostExposedToPlugins : HostOperations {
     override fun getCurrentLogin(): LoginInfo {
         val request = Request(Method.GET, "${configInstance.get("upload_url")}/get_login_info$accessToken")
         val response = QClient(request).bodyString()
@@ -76,6 +79,8 @@ class Host: HostOperations {
         val response = QClient(request).bodyString()
         return Gson().fromJson(response, StrangerInfo::class.java)
     }
+}
+class Host {
 
     companion object {
         var pluginMgr: PluginManager? = null
