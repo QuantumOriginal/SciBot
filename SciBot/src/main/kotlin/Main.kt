@@ -15,6 +15,7 @@ import org.http4k.core.Method
 import org.http4k.core.Request
 import org.http4k.core.then
 import org.scibot.HostOperations
+import org.scibot.Interfaces
 import org.scibot.LoginInfo
 import org.scibot.StrangerInfo
 import java.util.concurrent.Executors

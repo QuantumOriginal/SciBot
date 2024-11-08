@@ -17,6 +17,7 @@ import kotlin.reflect.jvm.javaMethod
 import org.scibot.Interfaces.*
 import org.scibot.Annonations.*
 import org.scibot.HostOperations
+import org.scibot.Interfaces
 import kotlin.reflect.full.*
 
 class PluginManager(private val pluginDirectory: String) {
@@ -82,11 +83,12 @@ class PluginManager(private val pluginDirectory: String) {
                 if (Plugin::class.java.isAssignableFrom(pluginClass)) {
                     val pluginInstance = pluginClass.kotlin.createInstance() as Plugin
                     loadedPlugins.add(pluginInstance)
-
                     val loggerName = loadPluginConfig("plugin-name", jarFile.toString()).toString()
                     val pluginLogger = Logger(loggerName)
                     val pluginHost: HostOperations = HostExposedToPlugins()
-
+                    pluginInstance.javaClass.methods.forEach { method ->
+                        logger.debug(method.name)
+                    }
                     val setLoggerMethod = pluginInstance.javaClass.methods.firstOrNull {
                         it.name == "getLogger" && it.parameterCount == 1 && it.parameterTypes[0] == SimpleLogger::class.java
                     }
@@ -98,7 +100,7 @@ class PluginManager(private val pluginDirectory: String) {
                     val pluginSender = Sender()
                     setSenderMethod?.invoke(pluginInstance, pluginSender)
 
-                    val getHostMethod = pluginClass.javaClass.methods.firstOrNull {
+                    val getHostMethod = pluginInstance.javaClass.methods.firstOrNull {
                         it.name == "getHost" && it.parameterCount == 1 && it.parameterTypes[0] == HostOperations::class.java
                     }
                     println("Found getHost method: ${getHostMethod != null}")
