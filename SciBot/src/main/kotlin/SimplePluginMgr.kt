@@ -19,6 +19,7 @@ import org.scibot.Annonations.*
 import org.scibot.HostOperations
 import org.scibot.InjectableTypes
 import org.scibot.Interfaces
+import kotlin.reflect.KClass
 import kotlin.reflect.full.*
 
 class PluginManager(private val pluginDirectory: String) {
@@ -31,6 +32,7 @@ class PluginManager(private val pluginDirectory: String) {
         var repository: String? = ""
     }
     val logger: Logger = Logger("PluginManager")
+    val pluginClassInstances: MutableSet<KClass<out Any>> = mutableSetOf()
     companion object{
         val loadedPlugins = mutableListOf<Plugin>()
         val disabledPlugins = mutableListOf<String>()
@@ -39,12 +41,14 @@ class PluginManager(private val pluginDirectory: String) {
     private val classLoader: URLClassLoader
     val disabledJarFiles = pluginDir.listFiles { _, name -> name.endsWith(".disabled")}
     val disabledJarUrls = disabledJarFiles?.map { it.toURI().toURL() }?.toTypedArray()
+
     init {
         val jarFiles = pluginDir.listFiles { _, name -> name.endsWith(".jar") }
         val jarUrls = jarFiles?.map { it.toURI().toURL() }?.toTypedArray()
         classLoader = URLClassLoader(jarUrls)
         logger.log("Started.")
     }
+
     fun getDisabledPlugins(){
         disabledJarFiles?.forEach { jarFile ->
             try {
@@ -56,6 +60,7 @@ class PluginManager(private val pluginDirectory: String) {
             }
         }
     }
+
     fun getPluginList() {
         val jarFiles = pluginDir.listFiles { _, name -> name.endsWith(".jar") }
         val pluginsInMarket : MutableList<PluginManifests> = mutableListOf()
@@ -75,6 +80,7 @@ class PluginManager(private val pluginDirectory: String) {
             }
         }
     }
+
     suspend fun loadPlugins() {
         val jarFiles = pluginDir.listFiles { _, name -> name.endsWith(".jar") }
         jarFiles?.forEach { jarFile ->
@@ -127,6 +133,7 @@ class PluginManager(private val pluginDirectory: String) {
                                 null
                             }
                             instance?.let {
+                                pluginClassInstances.add(it as KClass<out Any>)
                                 TaskScheduler.scheduleTasks(it)
                             }
                         }
@@ -141,11 +148,12 @@ class PluginManager(private val pluginDirectory: String) {
         }
     }
 
+
     fun invokePluginMethod(type: Annotype, event: org.scibot.Events.MajorEvent, args: MessageConstructor.Types) {
         logger.log("Loaded plugins: ${loadedPlugins.size}")
         logger.debug("-------------------BEGIN INVOKE-------------------")
 
-        loadedPlugins.forEach { plugin ->
+        pluginClassInstances.forEach { plugin ->
             val plainHandlerMethods = plugin::class.declaredMemberFunctions
                 .filter { it.findAnnotation<GroupHandler>() != null }
 
