@@ -86,9 +86,6 @@ class PluginManager(private val pluginDirectory: String) {
                     val loggerName = loadPluginConfig("plugin-name", jarFile.toString()).toString()
                     val pluginLogger = Logger(loggerName)
                     val pluginHost: HostOperations = HostExposedToPlugins()
-                    pluginInstance.javaClass.methods.forEach { method ->
-                        logger.debug(method.name)
-                    }
                     val setLoggerMethod = pluginInstance.javaClass.methods.firstOrNull {
                         it.name == "getLogger" && it.parameterCount == 1 && it.parameterTypes[0] == SimpleLogger::class.java
                     }
@@ -103,7 +100,6 @@ class PluginManager(private val pluginDirectory: String) {
                     val getHostMethod = pluginInstance.javaClass.methods.firstOrNull {
                         it.name == "getHost" && it.parameterCount == 1 && it.parameterTypes[0] == HostOperations::class.java
                     }
-                    println("Found getHost method: ${getHostMethod != null}")
                     getHostMethod?.invoke(pluginInstance, pluginHost)
 
                     pluginInstance.start()

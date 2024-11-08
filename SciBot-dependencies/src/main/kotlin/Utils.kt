@@ -1,5 +1,7 @@
 package org.scibot
 
+import com.google.gson.Gson
+import com.google.gson.JsonParser
 import org.json.JSONArray
 import org.json.JSONObject
 
@@ -13,7 +15,7 @@ class Utils {
     }
     fun hasAt(list: MutableList<Any>):Boolean{
         for (i in 0 until list.size){
-            if(list.get(i) is Events.AtMessage){
+            if(list[i] is Events.AtMessage){
                 return true
             }
         }
@@ -36,5 +38,11 @@ class Utils {
             this.contains("female") -> Gender.FEMALE
             else -> Gender.UNKNOWN
         }
+    }
+    fun <T> parseDataField(jsonString: String, targetClass: Class<T>): T {
+        val gson = Gson()
+        val jsonObject = JsonParser.parseString(jsonString).asJsonObject
+        val dataObject = jsonObject.getAsJsonObject("data")
+        return gson.fromJson(dataObject, targetClass)
     }
 }

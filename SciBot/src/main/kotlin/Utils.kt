@@ -1,5 +1,7 @@
 package ind.glowingstone
 
+import com.google.gson.Gson
+import com.google.gson.JsonParser
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.http4k.core.Method
@@ -55,5 +57,11 @@ class Utils {
                 null
             }
         }
+    }
+    fun <T> parseDataField(jsonString: String, targetClass: Class<T>): T? {
+        val gson = Gson()
+        val jsonObject = JsonParser.parseString(jsonString).asJsonObject
+        val dataObject = jsonObject.getAsJsonObject("data")
+        return gson.fromJson(dataObject, targetClass)
     }
 }

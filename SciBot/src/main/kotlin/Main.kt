@@ -9,6 +9,7 @@ import ind.glowingstone.Host.Companion.QClient
 import ind.glowingstone.Host.Companion.accessToken
 import ind.glowingstone.Host.Companion.configInstance
 import org.http4k.client.JavaHttpClient
+import org.scibot.Utils
 import org.http4k.core.Filter
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method
@@ -69,16 +70,16 @@ suspend fun main() {
 }
 
 class HostExposedToPlugins : HostOperations {
-    override fun getCurrentLogin(): LoginInfo {
+    override fun getCurrentLogin(): LoginInfo = with(Utils()) {
         val request = Request(Method.GET, "${configInstance.get("upload_url")}/get_login_info$accessToken")
         val response = QClient(request).bodyString()
-        return Gson().fromJson(response, LoginInfo::class.java)
+        return parseDataField(response, LoginInfo::class.java)
     }
 
-    override fun getStrangerInfo(userId: Long, cache: Boolean): StrangerInfo {
+    override fun getStrangerInfo(userId: Long, cache: Boolean): StrangerInfo = with(Utils()) {
         val request = Request(Method.GET, "${configInstance.get("upload_url")}/get_stranger_info$accessToken&user_id=$userId&no_cache=${!cache}")
         val response = QClient(request).bodyString()
-        return Gson().fromJson(response, StrangerInfo::class.java)
+        return parseDataField(response, StrangerInfo::class.java)
     }
 }
 class Host {
