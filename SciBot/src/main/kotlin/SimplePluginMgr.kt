@@ -17,6 +17,7 @@ import kotlin.reflect.jvm.javaMethod
 import org.scibot.Interfaces.*
 import org.scibot.Annonations.*
 import org.scibot.HostOperations
+import org.scibot.InjectableTypes
 import org.scibot.Interfaces
 import kotlin.reflect.full.*
 
@@ -85,23 +86,31 @@ class PluginManager(private val pluginDirectory: String) {
                     loadedPlugins.add(pluginInstance)
                     val loggerName = loadPluginConfig("plugin-name", jarFile.toString()).toString()
                     val pluginLogger = Logger(loggerName)
-                    val pluginHost: HostOperations = HostExposedToPlugins()
-                    val setLoggerMethod = pluginInstance.javaClass.methods.firstOrNull {
-                        it.name == "getLogger" && it.parameterCount == 1 && it.parameterTypes[0] == SimpleLogger::class.java
-                    }
-                    logger.debug("Logger Method: ${setLoggerMethod?.name}")
-                    setLoggerMethod?.invoke(pluginInstance, pluginLogger)
-                    val setSenderMethod = pluginInstance.javaClass.methods.firstOrNull {
-                        it.name == "getSender" &&it.parameterCount == 1 && it.parameterTypes[0] == SimpleSender::class.java
-                    }
                     val pluginSender = Sender()
-                    setSenderMethod?.invoke(pluginInstance, pluginSender)
+                    val pluginHost: HostOperations = HostExposedToPlugins()
+                    val markedInjectableMethods = pluginInstance.javaClass.methods.filter { it.isAnnotationPresent(Inject::class.java) }
+                    markedInjectableMethods.forEach { method ->
+                        method.isAccessible = true
+                        val injectAnnotation = method.getAnnotation(Inject::class.java)
 
-                    val getHostMethod = pluginInstance.javaClass.methods.firstOrNull {
-                        it.name == "getHost" && it.parameterCount == 1 && it.parameterTypes[0] == HostOperations::class.java
+                        val injectionTarget = when (injectAnnotation?.type) {
+                            InjectableTypes.LOGGER -> pluginLogger
+                            InjectableTypes.SENDER -> pluginSender
+                            InjectableTypes.HOST -> pluginHost
+                            null -> {
+                                logger.log("ERROR: ${method.name}() 没有指定要注入的类型.")
+                                return@forEach
+                            }
+                        }
+
+                        try {
+                            method.invoke(pluginInstance, injectionTarget)
+                            logger.debug("成功注入 ${injectAnnotation.type} 到方法 ${method.name}")
+                        } catch (e: Exception) {
+                            logger.log("注入失败: 方法 ${method.name} 无法被调用: ${e.message}", SEVERE)
+                            e.printStackTrace()
+                        }
                     }
-                    getHostMethod?.invoke(pluginInstance, pluginHost)
-
                     pluginInstance.start()
                 }
 

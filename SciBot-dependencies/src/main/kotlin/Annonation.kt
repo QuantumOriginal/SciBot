@@ -14,4 +14,13 @@ class Annonations {
     @Target(AnnotationTarget.FUNCTION)
     annotation class Scheduler(val interval: Long)
 
+    @Retention(AnnotationRetention.RUNTIME)
+    @Target(AnnotationTarget.FUNCTION)
+    annotation class Inject(val type: InjectableTypes)
+}
+
+enum class InjectableTypes {
+    LOGGER,
+    SENDER,
+    HOST
 }
